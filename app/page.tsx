@@ -1,5 +1,6 @@
 import Nav from '@/components/Nav'
 import Hero from '@/components/Hero'
+import IntegrationDiagram from '@/components/IntegrationDiagram'
 import UseCases from '@/components/UseCases'
 import HowItWorks from '@/components/HowItWorks'
 import WhyLeNode from '@/components/WhyLeNode'
@@ -42,6 +43,7 @@ export default function HomePage() {
       <Nav />
       <main>
         <Hero />
+        <IntegrationDiagram />
 
         {/* Social proof strip */}
         <div className="border-y border-border py-10">
