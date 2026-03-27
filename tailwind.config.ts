@@ -10,11 +10,12 @@ const config: Config = {
     extend: {
       colors: {
         background: '#FFFFFF',
-        foreground: '#111827',
-        accent: '#4F46E5',
-        'accent-light': '#EEF2FF',
+        foreground: '#212226',
+        accent: '#0E34F4',
+        'accent-light': '#EBF0FF',
         border: '#E5E7EB',
         muted: '#6B7280',
+        dark: '#212226',
       },
       fontFamily: {
         sans: ['var(--font-geist-sans)', 'Inter', 'system-ui', 'sans-serif'],
