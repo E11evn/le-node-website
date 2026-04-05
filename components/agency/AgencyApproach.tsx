@@ -2,31 +2,53 @@
 
 import { useState } from 'react'
 
-// ── Deterministic waveform bar generator ──────────────────────────────────────
-// Uses a linear congruential generator so bars are stable across renders
-function makeBars(count: number, seed: number): number[] {
+// ── Bar generators with intentional height profiles ───────────────────────────
+// Step 1 — Audit: all bars small (3–9 px)
+function makeAuditBars(count: number): number[] {
   const out: number[] = []
-  let s = seed
+  let s = 7
   for (let i = 0; i < count; i++) {
     s = (s * 1664525 + 1013904223) & 0xffffffff
-    out.push(4 + ((s >>> 0) % 30))
+    out.push(3 + ((s >>> 0) % 7))
   }
   return out
 }
 
-type PhaseId = 'audit' | 'implement' | 'execute'
+// Step 2 — Implement: crescendo, small → tall left to right
+function makeImplementBars(count: number): number[] {
+  const out: number[] = []
+  let s = 13
+  for (let i = 0; i < count; i++) {
+    s = (s * 1664525 + 1013904223) & 0xffffffff
+    const progress = i / count                   // 0 → 1
+    const minH = 3  + Math.round(progress * 16)  // 3  → 19
+    const maxH = 9  + Math.round(progress * 27)  // 9  → 36
+    out.push(minH + ((s >>> 0) % Math.max(1, maxH - minH + 1)))
+  }
+  return out
+}
 
+// Step 3 — Scale: all bars at maximum (28–36 px)
+function makeScaleBars(count: number): number[] {
+  const out: number[] = []
+  let s = 23
+  for (let i = 0; i < count; i++) {
+    s = (s * 1664525 + 1013904223) & 0xffffffff
+    out.push(28 + ((s >>> 0) % 9))
+  }
+  return out
+}
+
+type PhaseId = 'audit' | 'implement' | 'scale'
 const ACCENT = '#FA7900'
 
-// flex proportions mirror phase duration: Audit=2w, Implement=6w, Execute=ongoing(~8w eq)
 const phases = [
   {
     id: 'audit' as PhaseId,
     label: 'Week 1–2',
     title: 'Audit',
     grow: 2,
-    // ~60 bars for 2 flex units (fills ~200px at 3px/bar)
-    bars: makeBars(80, 7),
+    bars: makeAuditBars(80),
     weekLabels: ['Week 1', 'Week 2'],
     description:
       "We diagnose before we prescribe. Deep-dive into your ICP, messaging, channels, CRM health, and team dynamics. You get a clear picture of what's broken and what to do next.",
@@ -43,8 +65,7 @@ const phases = [
     label: 'Week 3–8',
     title: 'Implement',
     grow: 6,
-    // ~180 bars for 6 flex units
-    bars: makeBars(220, 13),
+    bars: makeImplementBars(220),
     weekLabels: ['Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
     description:
       'We build the engine with you — not for you. Outbound sequences, CRM workflows, lead scoring, sales playbooks. Everything documented and owned by your team.',
@@ -57,20 +78,20 @@ const phases = [
     ],
   },
   {
-    id: 'execute' as PhaseId,
+    id: 'scale' as PhaseId,
     label: 'Month 3+',
-    title: 'Execute',
+    title: 'Scale',
     grow: 4,
-    // ~120 bars for 4 flex units
-    bars: makeBars(150, 23),
+    bars: makeScaleBars(150),
     weekLabels: ['Month 3', 'Month 4', 'Month 5+'],
     description:
-      "We run campaigns alongside your team, iterate weekly on what's working, and own pipeline development until the motion is proven and self-sustaining.",
+      "We run campaigns alongside your team, hit revenue targets together, and hand off a fully self-sustaining GTM motion your team can own and grow independently.",
     deliverables: [
       'Weekly campaign management',
-      'Performance reporting',
-      'Iteration cycles',
-      'Team coaching',
+      'Pipeline reporting & OKRs',
+      'Hiring & team ramp plan',
+      'Revenue operations setup',
+      'Handoff & independence plan',
     ],
   },
 ]
@@ -82,7 +103,7 @@ export default function AgencyApproach() {
     <section id="approach" className="bg-[#0C0C14]">
       <div className="container-content">
 
-        {/* ── Section header ───────────────────────────────────────────── */}
+        {/* Header */}
         <span
           className="text-xs font-semibold tracking-widest uppercase mb-4 block"
           style={{ color: ACCENT }}
@@ -90,7 +111,7 @@ export default function AgencyApproach() {
           Our Method
         </span>
         <h2 className="text-display-sm font-bold text-white mb-4 max-w-2xl">
-          Audit. Implement. Execute. Fast.
+          Audit. Implement. Scale.
         </h2>
         <p className="text-white/40 text-lg mb-12 max-w-xl">
           We don&apos;t hand you a deck and disappear. We build the system and run it
@@ -98,10 +119,7 @@ export default function AgencyApproach() {
         </p>
 
         {/* ── Waveform scrubber ────────────────────────────────────────── */}
-        <div
-          className="flex gap-0 cursor-pointer mb-1"
-          style={{ height: 48 }}
-        >
+        <div className="flex gap-0 cursor-pointer mb-1" style={{ height: 48 }}>
           {phases.map((phase) => (
             <div
               key={phase.id}
@@ -116,10 +134,7 @@ export default function AgencyApproach() {
                   style={{
                     width: 2,
                     height: h,
-                    background:
-                      active === phase.id
-                        ? ACCENT
-                        : 'rgba(255,255,255,0.11)',
+                    background: active === phase.id ? ACCENT : 'rgba(255,255,255,0.11)',
                   }}
                 />
               ))}
@@ -127,7 +142,7 @@ export default function AgencyApproach() {
           ))}
         </div>
 
-        {/* Week / month labels */}
+        {/* Week labels */}
         <div className="flex mb-4">
           {phases.map((phase) => (
             <div
@@ -140,12 +155,7 @@ export default function AgencyApproach() {
                 <span
                   key={lbl}
                   className="text-[9px] font-mono font-medium transition-colors duration-200 select-none"
-                  style={{
-                    color:
-                      active === phase.id
-                        ? ACCENT
-                        : 'rgba(255,255,255,0.2)',
-                  }}
+                  style={{ color: active === phase.id ? ACCENT : 'rgba(255,255,255,0.2)' }}
                 >
                   {lbl}
                 </span>
@@ -191,55 +201,31 @@ export default function AgencyApproach() {
                 key={phase.id}
                 className="rounded-xl p-6 border transition-all duration-300 cursor-pointer"
                 style={{
-                  background: isActive
-                    ? 'rgba(250,121,0,0.08)'
-                    : 'rgba(255,255,255,0.02)',
-                  borderColor: isActive
-                    ? 'rgba(250,121,0,0.35)'
-                    : 'rgba(255,255,255,0.06)',
+                  background: isActive ? 'rgba(250,121,0,0.08)' : 'rgba(255,255,255,0.02)',
+                  borderColor: isActive ? 'rgba(250,121,0,0.35)' : 'rgba(255,255,255,0.06)',
                 }}
                 onClick={() => setActive(phase.id)}
               >
-                {/* Phase label */}
                 <p
                   className="text-[10px] font-mono font-semibold uppercase tracking-widest mb-4 transition-colors duration-200"
-                  style={{
-                    color: isActive ? ACCENT : 'rgba(255,255,255,0.25)',
-                  }}
+                  style={{ color: isActive ? ACCENT : 'rgba(255,255,255,0.25)' }}
                 >
                   {phase.label} — {phase.title}
                 </p>
-
-                {/* Description */}
                 <p
                   className="text-sm leading-relaxed mb-5 transition-colors duration-200"
-                  style={{
-                    color: isActive
-                      ? 'rgba(255,255,255,0.65)'
-                      : 'rgba(255,255,255,0.35)',
-                  }}
+                  style={{ color: isActive ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.35)' }}
                 >
                   {phase.description}
                 </p>
-
-                {/* Deliverables */}
                 <ul className="space-y-2">
                   {phase.deliverables.map((item) => (
                     <li
                       key={item}
                       className="flex items-start gap-2 text-xs transition-colors duration-200"
-                      style={{
-                        color: isActive
-                          ? 'rgba(255,255,255,0.5)'
-                          : 'rgba(255,255,255,0.2)',
-                      }}
+                      style={{ color: isActive ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)' }}
                     >
-                      <span
-                        className="mt-0.5 flex-shrink-0 transition-colors duration-200"
-                        style={{ color: isActive ? ACCENT : 'rgba(255,255,255,0.15)' }}
-                      >
-                        →
-                      </span>
+                      <span className="mt-0.5 flex-shrink-0" style={{ color: isActive ? ACCENT : 'rgba(255,255,255,0.15)' }}>→</span>
                       {item}
                     </li>
                   ))}

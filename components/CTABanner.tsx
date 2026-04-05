@@ -11,10 +11,10 @@ export default function CTABanner() {
           Tell us about your team and we&apos;ll show you exactly how le-node fits.
         </p>
         <Link
-          href="/contact"
+          href="/waitlist"
           className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#0000FA] font-semibold rounded-lg text-base hover:bg-blue-50 transition-colors"
         >
-          Get in touch →
+          Join waitlist →
         </Link>
       </div>
     </section>

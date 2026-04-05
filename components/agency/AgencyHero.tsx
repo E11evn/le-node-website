@@ -20,7 +20,7 @@ export default function AgencyHero() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/contact" className="btn-agency text-base px-6 py-3">
+          <Link href="/book" className="btn-agency text-base px-6 py-3">
             Book a call
           </Link>
           <a href="#approach" className="btn-secondary text-base px-6 py-3">

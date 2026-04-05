@@ -55,7 +55,7 @@ export default function Nav() {
             Book a call
           </Link>
         ) : (
-          <Link href="/contact" className="btn-primary">
+          <Link href="/waitlist" className="btn-primary">
             Join waitlist
           </Link>
         )}

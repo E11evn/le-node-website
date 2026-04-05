@@ -1,95 +1,135 @@
-// ─── Integration flow diagram — horizontal layout ─────────────────────────────
-// Left: 7 source categories with tool badges
-// Center: le-node hub
-// Right: 4 output channels
-// Pure SVG, CSS-animated connector paths only.
+// ─── Integration flow — floating cards in space ───────────────────────────────
+// Individual floating cards → le-node hub → output channels
+// Pure SVG with CSS-animated flow lines and per-card float animations.
+
+const ACCENT = '#0043FA'
 
 const FLOW = {
-  stroke: '#0000FA',
+  stroke: ACCENT,
   strokeWidth: 1.2,
   fill: 'none',
   strokeDasharray: '5 9',
-  animation: 'flow-anim 1.8s linear infinite',
+  animation: 'flow-anim 1.6s linear infinite',
 } as const
 
-const inputs = [
-  {
-    label: 'Signals',
-    tools: [
-      { name: 'Clay',     bg: '#F47B20' },
-      { name: 'LinkedIn', bg: '#0A66C2' },
-      { name: 'Claude',   bg: '#7C3AED' },
-    ],
-  },
-  {
-    label: 'Inbound',
-    tools: [
-      { name: 'Typeform', bg: '#E24329' },
-      { name: 'Webflow',  bg: '#4353FF' },
-      { name: 'HubSpot',  bg: '#FF7A59' },
-    ],
-  },
-  {
-    label: 'Ads',
-    tools: [
-      { name: 'G Ads',  bg: '#4285F4' },
-      { name: 'LI Ads', bg: '#0A66C2' },
-      { name: 'FB Ads', bg: '#1877F2' },
-    ],
-  },
-  {
-    label: 'Events',
-    tools: [
-      { name: 'Webhook', bg: '#6B7280' },
-      { name: 'n8n',     bg: '#EA4B71' },
-      { name: 'Clay',    bg: '#F47B20' },
-    ],
-  },
-  {
-    label: 'Website',
-    tools: [
-      { name: 'GA4',     bg: '#E37400' },
-      { name: 'Segment', bg: '#52BD94' },
-      { name: 'Hotjar',  bg: '#FF3C00' },
-    ],
-  },
-  {
-    label: 'Database',
-    tools: [
-      { name: 'Supabase', bg: '#3ECF8E' },
-      { name: 'BigQuery', bg: '#4285F4' },
-      { name: 'DB',       bg: '#64748B' },
-    ],
-  },
-  {
-    label: 'Providers',
-    tools: [
-      { name: 'Apollo',    bg: '#7C3AED' },
-      { name: 'Fullenrc.', bg: '#F59E0B' },
-      { name: 'Dropc.',    bg: '#10B981' },
-    ],
-  },
+// ── Logo icon renderer ─────────────────────────────────────────────────────────
+// Renders a small branded square at (x, y) with size s
+type LogoDef = { bg: string; text: string; fs?: number }
+const LOGO_MAP: Record<string, LogoDef> = {
+  clay:        { bg: '#F47B20', text: 'C',   fs: 10 },
+  linkedin:    { bg: '#0A66C2', text: 'in',  fs: 8  },
+  claude:      { bg: '#7C3AED', text: 'A',   fs: 10 },
+  typeform:    { bg: '#262626', text: 'TF',  fs: 7  },
+  webflow:     { bg: '#4353FF', text: 'W',   fs: 10 },
+  hubspot:     { bg: '#FF7A59', text: 'HS',  fs: 7  },
+  gads:        { bg: '#4285F4', text: 'G',   fs: 10 },
+  liads:       { bg: '#0A66C2', text: 'in',  fs: 8  },
+  fbads:       { bg: '#1877F2', text: 'f',   fs: 12 },
+  webhook:     { bg: '#6B7280', text: '↗',   fs: 11 },
+  n8n:         { bg: '#EA4B71', text: 'n8n', fs: 7  },
+  ga4:         { bg: '#E37400', text: 'G4',  fs: 7  },
+  segment:     { bg: '#52BD94', text: 'S',   fs: 10 },
+  hotjar:      { bg: '#FF3C00', text: 'HJ',  fs: 7  },
+  supabase:    { bg: '#3ECF8E', text: '⚡',   fs: 11 },
+  bigquery:    { bg: '#4285F4', text: 'BQ',  fs: 7  },
+  db:          { bg: '#64748B', text: '▦',   fs: 11 },
+  apollo:      { bg: '#7C3AED', text: 'Ap',  fs: 8  },
+  fullenrich:  { bg: '#F59E0B', text: 'FE',  fs: 7  },
+  dropcontact: { bg: '#10B981', text: 'DC',  fs: 7  },
+}
+
+function Logo({ id, x, y, s = 22 }: { id: string; x: number; y: number; s?: number }) {
+  const def = LOGO_MAP[id] ?? { bg: '#374151', text: '?', fs: 9 }
+  const fs = def.fs ?? 9
+  return (
+    <g>
+      <rect x={x} y={y} width={s} height={s} rx={Math.round(s / 5)} fill={def.bg} />
+      <text
+        x={x + s / 2}
+        y={y + s / 2 + fs * 0.38}
+        textAnchor="middle"
+        fill="white"
+        fontSize={fs}
+        fontWeight="700"
+        fontFamily="system-ui,sans-serif"
+      >
+        {def.text}
+      </text>
+    </g>
+  )
+}
+
+// ── Data ──────────────────────────────────────────────────────────────────────
+const INPUTS = [
+  { label: 'Signals',   logos: ['clay', 'linkedin', 'claude']      },
+  { label: 'Inbound',   logos: ['typeform', 'webflow', 'hubspot']   },
+  { label: 'Ads',       logos: ['gads', 'liads', 'fbads']           },
+  { label: 'Events',    logos: ['webhook', 'n8n', 'clay']           },
+  { label: 'Website',   logos: ['ga4', 'segment', 'hotjar']         },
+  { label: 'Database',  logos: ['supabase', 'bigquery', 'db']       },
+  { label: 'Providers', logos: ['apollo', 'fullenrich', 'dropcontact'] },
 ]
 
-// Row vertical centres (7 rows, 56px apart, starting at y=54)
-const ROW_YS = [54, 110, 166, 222, 278, 334, 390]
-const HUB_Y  = 222   // vertical centre of le-node card
+const OUTPUTS = [
+  { label: 'CRM',                color: '#FF7A59' },
+  { label: 'Qualified Leads',    color: ACCENT     },
+  { label: 'Sales Enablement',   color: '#52BD94' },
+  { label: 'Sales Ready Opp.',   color: '#F59E0B' },
+]
 
-const outputs = [
-  { label: 'CRM',                  dot: '#FF7A59', y: 120 },
-  { label: 'Qualified Leads',      dot: '#0000FA', y: 196 },
-  { label: 'Sales Enablement',     dot: '#52BD94', y: 272 },
-  { label: 'Sales Ready Opp.',     dot: '#F59E0B', y: 348 },
+// Card geometry
+const CARD_W  = 162
+const CARD_H  = 68
+const GAP_Y   = 10
+const CARD_X  = 28                                 // left edge of input cards
+const HUB_X   = 388                                // left edge of le-node card
+const HUB_W   = 184
+const HUB_H   = 128
+const HUB_CY  = 264                                // vertical centre of le-node card
+const OUT_X   = 694                                // left edge of output cards
+const OUT_W   = 184
+
+// Input card top-Y for each row
+function inputY(i: number) { return 12 + i * (CARD_H + GAP_Y) }
+function inputCY(i: number) { return inputY(i) + CARD_H / 2 }
+
+// Output card centres (4 cards, evenly spaced around HUB_CY)
+const OUT_CYS = [HUB_CY - 105, HUB_CY - 35, HUB_CY + 35, HUB_CY + 105]
+
+// Float animation params per card
+const FLOATS = [
+  { dy: '0,0; 0,-7; 0,0',       dur: '4.6s', begin: '0s'    },
+  { dy: '0,-3; 0,5; 0,-3',      dur: '5.2s', begin: '-1.1s' },
+  { dy: '0,0; 0,-8; 0,4; 0,0',  dur: '4.9s', begin: '-2.4s' },
+  { dy: '0,2; 0,-6; 0,2',       dur: '5.5s', begin: '-0.7s' },
+  { dy: '0,-2; 0,7; 0,-2',      dur: '4.3s', begin: '-3.2s' },
+  { dy: '0,0; 0,-5; 0,3; 0,0',  dur: '5.7s', begin: '-1.8s' },
+  { dy: '0,3; 0,-7; 0,3',       dur: '4.8s', begin: '-0.4s' },
+]
+const OUT_FLOATS = [
+  { dy: '0,-2; 0,6; 0,-2', dur: '5.1s', begin: '-0.9s' },
+  { dy: '0,0; 0,-7; 0,0',  dur: '4.7s', begin: '-2.6s' },
+  { dy: '0,4; 0,-4; 0,4',  dur: '5.3s', begin: '-1.4s' },
+  { dy: '0,-3; 0,5; 0,-3', dur: '4.5s', begin: '-3.8s' },
 ]
 
 export default function IntegrationDiagram() {
+  const inputRight  = CARD_X + CARD_W                // x=190
+  const hubLeft     = HUB_X                          // x=388
+  const hubRight    = HUB_X + HUB_W                  // x=572
+  const hubTop      = HUB_CY - HUB_H / 2            // y=200
+  const outLeft     = OUT_X                          // x=694
+
   return (
     <section className="py-20 md:py-28 bg-[#212226]">
       <div className="container-content">
 
         {/* Header */}
         <div className="mb-12">
-          <span className="text-xs font-semibold tracking-widest uppercase text-[#0000FA] mb-4 block">
+          <span
+            className="text-xs font-semibold tracking-widest uppercase mb-4 block"
+            style={{ color: ACCENT }}
+          >
             Infrastructure
           </span>
           <h2 className="text-display-sm font-bold text-white mb-4 max-w-xl">
@@ -101,171 +141,292 @@ export default function IntegrationDiagram() {
           </p>
         </div>
 
-        {/* SVG diagram */}
+        {/* Diagram */}
         <svg
-          viewBox="0 0 900 468"
+          viewBox={`0 0 900 ${12 + 7 * (CARD_H + GAP_Y) - GAP_Y + 12}`}
           width="100%"
           xmlns="http://www.w3.org/2000/svg"
           style={{ display: 'block', maxWidth: 900, margin: '0 auto' }}
           aria-label="le-node integration flow diagram"
         >
           <defs>
-            <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5"
-              markerWidth="5" markerHeight="5" orient="auto">
-              <path d="M 0 1 L 9 5 L 0 9 z" fill="#0000FA" opacity="0.7" />
+            <marker
+              id="arrowBlue" viewBox="0 0 10 10"
+              refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"
+            >
+              <path d="M 0 1 L 9 5 L 0 9 z" fill={ACCENT} opacity="0.75" />
             </marker>
-            <style>{`@keyframes flow-anim { to { stroke-dashoffset: -14; } }`}</style>
+
+            {/* Glow filter for le-node card */}
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            <style>{`
+              @keyframes flow-anim { to { stroke-dashoffset: -14; } }
+            `}</style>
           </defs>
 
-          {/* ── Background ──────────────────────────────────────────────────── */}
-          <rect width="900" height="468" fill="#1A1D22" rx="16" />
-
-          {/* Dot grid */}
-          {Array.from({ length: 21 }).map((_, c) =>
-            Array.from({ length: 11 }).map((_, r) => (
-              <circle key={`d-${c}-${r}`}
-                cx={c * 44 + 10} cy={r * 44 + 10}
-                r="1" fill="rgba(255,255,255,0.05)"
+          {/* Dot-grid background */}
+          {Array.from({ length: 22 }).map((_, c) =>
+            Array.from({ length: 14 }).map((_, r) => (
+              <circle
+                key={`d-${c}-${r}`}
+                cx={c * 42 + 8} cy={r * 40 + 8}
+                r="1" fill="rgba(255,255,255,0.04)"
               />
             ))
           )}
 
-          {/* HUD corners */}
-          <path d="M 26 14 L 14 14 L 14 26" fill="none" stroke="rgba(0,0,250,0.25)" strokeWidth="1.5" />
-          <path d="M 874 14 L 886 14 L 886 26" fill="none" stroke="rgba(0,0,250,0.25)" strokeWidth="1.5" />
-          <path d="M 26 454 L 14 454 L 14 442" fill="none" stroke="rgba(0,0,250,0.25)" strokeWidth="1.5" />
-          <path d="M 874 454 L 886 454 L 886 442" fill="none" stroke="rgba(0,0,250,0.25)" strokeWidth="1.5" />
+          {/* ── Animated connection paths (behind cards) ───────────────── */}
 
-          {/* ── Left panel — data sources ────────────────────────────────── */}
-          <rect x="10" y="10" width="258" height="448" fill="rgba(255,255,255,0.015)" rx="8" />
+          {/* Input → le-node paths (convergence) */}
+          {INPUTS.map((_, i) => {
+            const cy = inputCY(i)
+            const delay = `${-(i * 0.2).toFixed(1)}s`
+            return (
+              <path
+                key={`in-path-${i}`}
+                d={`M ${inputRight} ${cy} C ${(inputRight + hubLeft) / 2} ${cy} ${(inputRight + hubLeft) / 2} ${HUB_CY} ${hubLeft} ${HUB_CY}`}
+                style={{ ...FLOW, animationDelay: delay }}
+              />
+            )
+          })}
 
-          <text x="14" y="28" fill="rgba(255,255,255,0.22)" fontSize="7.5"
-            fontFamily="system-ui,sans-serif" fontWeight="700" letterSpacing="1.8">
-            DATA SOURCES
-          </text>
+          {/* le-node → output paths (divergence) */}
+          {OUT_CYS.map((oCy, i) => {
+            const delay = `${-(i * 0.3).toFixed(1)}s`
+            return (
+              <path
+                key={`out-path-${i}`}
+                d={`M ${hubRight} ${HUB_CY} C ${(hubRight + outLeft) / 2} ${HUB_CY} ${(hubRight + outLeft) / 2} ${oCy} ${outLeft} ${oCy}`}
+                style={{ ...FLOW, animationDelay: delay }}
+                markerEnd="url(#arrowBlue)"
+              />
+            )
+          })}
 
-          {inputs.map(({ label, tools }, idx) => {
-            const y = ROW_YS[idx]
+          {/* ── Input floating cards ────────────────────────────────────── */}
+          {INPUTS.map(({ label, logos }, i) => {
+            const cy  = inputY(i)
+            const cx  = CARD_X + CARD_W / 2
+            const f   = FLOATS[i]
+            // 3 logos centred in card
+            const logoSize  = 22
+            const logoGap   = 8
+            const logoTotal = 3 * logoSize + 2 * logoGap
+            const logoStartX = CARD_X + (CARD_W - logoTotal) / 2
+
             return (
               <g key={label}>
-                {/* Row separator */}
-                {idx > 0 && (
-                  <line x1="14" y1={y - 28} x2="258" y2={y - 28}
-                    stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-                )}
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values={f.dy}
+                  dur={f.dur}
+                  begin={f.begin}
+                  repeatCount="indefinite"
+                  calcMode="spline"
+                  keyTimes={f.dy.split(';').map((_, j, a) => (j / (a.length - 1)).toFixed(2)).join(';')}
+                  keySplines={Array(f.dy.split(';').length - 1).fill('0.45 0 0.55 1').join(';')}
+                />
+
+                {/* Card bg */}
+                <rect
+                  x={CARD_X} y={cy}
+                  width={CARD_W} height={CARD_H}
+                  rx="10"
+                  fill="rgba(255,255,255,0.04)"
+                  stroke="rgba(255,255,255,0.10)"
+                  strokeWidth="1"
+                />
 
                 {/* Category label */}
-                <text x="16" y={y + 4} fill="rgba(255,255,255,0.35)"
-                  fontSize="8.5" fontFamily="system-ui,sans-serif" fontWeight="500">
+                <text
+                  x={cx} y={cy + 20}
+                  textAnchor="middle"
+                  fill="rgba(255,255,255,0.90)"
+                  fontSize="11"
+                  fontWeight="600"
+                  fontFamily="system-ui,sans-serif"
+                >
                   {label}
                 </text>
 
-                {/* 3 tool badges */}
-                {tools.map((tool, ti) => {
-                  const bx = 74 + ti * 58
-                  return (
-                    <g key={`${label}-${tool.name}`}>
-                      <rect x={bx} y={y - 9} width="54" height="18" rx="3"
-                        fill={tool.bg} opacity="0.85" />
-                      <text x={bx + 27} y={y + 4} textAnchor="middle"
-                        fill="white" fontSize="7.5" fontWeight="600"
-                        fontFamily="system-ui,sans-serif">
-                        {tool.name}
-                      </text>
-                    </g>
-                  )
-                })}
+                {/* Separator */}
+                <line
+                  x1={CARD_X + 10} y1={cy + 29}
+                  x2={CARD_X + CARD_W - 10} y2={cy + 29}
+                  stroke="rgba(255,255,255,0.07)" strokeWidth="1"
+                />
 
-                {/* End dot before connector */}
-                <circle cx="252" cy={y} r="2.5" fill="#0000FA" opacity="0.45" />
+                {/* 3 logos */}
+                {logos.map((id, li) => (
+                  <Logo
+                    key={id + li}
+                    id={id}
+                    x={logoStartX + li * (logoSize + logoGap)}
+                    y={cy + 36}
+                    s={logoSize}
+                  />
+                ))}
 
-                {/* Animated convergence path to hub */}
-                <path
-                  d={`M 252 ${y} C 280 ${y} 280 ${HUB_Y} 312 ${HUB_Y}`}
-                  style={{ ...FLOW, animationDelay: `${-idx * 0.22}s` }}
+                {/* Connection dot */}
+                <circle
+                  cx={inputRight} cy={cy + CARD_H / 2}
+                  r="3" fill={ACCENT} opacity="0.4"
                 />
               </g>
             )
           })}
 
-          {/* ── le-node hub card ────────────────────────────────────────────── */}
-          <rect x="315" y="142" width="272" height="160"
-            fill="rgba(0,0,250,0.08)" stroke="rgba(0,0,250,0.45)"
-            strokeWidth="1.5" rx="10" />
-          {/* Left accent bar */}
-          <rect x="315" y="142" width="4" height="160" fill="#0000FA" rx="2" />
+          {/* ── le-node hub card ───────────────────────────────────────── */}
+          <g>
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              values="0,0; 0,-3; 0,3; 0,0"
+              dur="6s"
+              begin="-2s"
+              repeatCount="indefinite"
+              calcMode="spline"
+              keyTimes="0;0.33;0.66;1"
+              keySplines="0.45 0 0.55 1;0.45 0 0.55 1;0.45 0 0.55 1"
+            />
 
-          {/* Hub label */}
-          <text x="336" y="172" fill="white" fontSize="15" fontWeight="700"
-            fontFamily="system-ui,sans-serif">
-            le-node
-          </text>
+            {/* Outer glow ring */}
+            <rect
+              x={HUB_X - 6} y={hubTop - 6}
+              width={HUB_W + 12} height={HUB_H + 12}
+              rx="18"
+              fill="none"
+              stroke={`${ACCENT}30`}
+              strokeWidth="1"
+            />
 
-          {/* Subtitle */}
-          <text x="336" y="190" fill="rgba(255,255,255,0.38)" fontSize="9"
-            fontFamily="system-ui,sans-serif">
-            AI-native qualification engine
-          </text>
+            {/* Card */}
+            <rect
+              x={HUB_X} y={hubTop}
+              width={HUB_W} height={HUB_H}
+              rx="12"
+              fill="rgba(0,67,250,0.12)"
+              stroke="rgba(0,67,250,0.55)"
+              strokeWidth="1.5"
+              filter="url(#glow)"
+            />
 
-          {/* Process pills — Identify Enrich Score Route */}
-          {['Identify', 'Enrich', 'Score', 'Route'].map((step, i) => (
-            <g key={step}>
-              <rect x={334 + i * 62} y="204" width="58" height="26"
-                fill="rgba(0,0,250,0.2)" stroke="rgba(0,0,250,0.4)"
-                strokeWidth="1" rx="5" />
-              <text
-                x={334 + i * 62 + 29} y="221"
-                textAnchor="middle" fill="rgba(255,255,255,0.85)"
-                fontSize="9" fontWeight="600"
-                fontFamily="system-ui,sans-serif">
-                {step}
-              </text>
-            </g>
-          ))}
+            {/* Left accent bar */}
+            <rect
+              x={HUB_X} y={hubTop}
+              width="4" height={HUB_H}
+              rx="2" fill={ACCENT}
+            />
 
-          {/* Hub entry / exit dots */}
-          <circle cx="313" cy={HUB_Y} r="3.5" fill="#0000FA" opacity="0.55" />
-          <circle cx="587" cy={HUB_Y} r="3.5" fill="#0000FA" opacity="0.55" />
+            {/* le-node logo (PNG, white on transparent) */}
+            <image
+              href="/logo.png"
+              x={HUB_X + (HUB_W - 120) / 2}
+              y={hubTop + 22}
+              width="120"
+              height="38"
+              preserveAspectRatio="xMidYMid meet"
+            />
 
-          {/* ── Right panel — outputs ────────────────────────────────────── */}
-          <rect x="636" y="88" width="252" height="292"
-            fill="rgba(255,255,255,0.015)" rx="8" />
+            {/* Subtitle */}
+            <text
+              x={HUB_X + HUB_W / 2}
+              y={hubTop + 76}
+              textAnchor="middle"
+              fill="rgba(255,255,255,0.40)"
+              fontSize="9.5"
+              fontFamily="system-ui,sans-serif"
+              letterSpacing="0.5"
+            >
+              AI native GTM Engine
+            </text>
 
-          <text x="640" y="78" fill="rgba(255,255,255,0.22)" fontSize="7.5"
-            fontFamily="system-ui,sans-serif" fontWeight="700" letterSpacing="1.8">
-            OUTPUT
-          </text>
+            {/* Process pills */}
+            {['Identify', 'Enrich', 'Score', 'Route'].map((step, i) => (
+              <g key={step}>
+                <rect
+                  x={HUB_X + 10 + i * 40} y={hubTop + 88}
+                  width="36" height="20"
+                  rx="5"
+                  fill="rgba(0,67,250,0.22)"
+                  stroke="rgba(0,67,250,0.4)"
+                  strokeWidth="1"
+                />
+                <text
+                  x={HUB_X + 10 + i * 40 + 18}
+                  y={hubTop + 102}
+                  textAnchor="middle"
+                  fill="rgba(255,255,255,0.80)"
+                  fontSize="7.5"
+                  fontWeight="600"
+                  fontFamily="system-ui,sans-serif"
+                >
+                  {step}
+                </text>
+              </g>
+            ))}
 
-          {outputs.map(({ label, dot, y }, idx) => (
-            <g key={label}>
-              {/* Animated divergence path from hub */}
-              <path
-                d={`M 587 ${HUB_Y} C 614 ${HUB_Y} 614 ${y} 638 ${y}`}
-                style={{ ...FLOW, animationDelay: `${-idx * 0.3}s` }}
-                markerEnd="url(#arrowBlue)"
-              />
+            {/* Entry / exit dots */}
+            <circle cx={hubLeft}  cy={HUB_CY} r="4" fill={ACCENT} opacity="0.55" />
+            <circle cx={hubRight} cy={HUB_CY} r="4" fill={ACCENT} opacity="0.55" />
+          </g>
 
-              {/* Row separator */}
-              {idx > 0 && (
-                <line x1="640" y1={y - 38} x2="880" y2={y - 38}
-                  stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-              )}
+          {/* ── Output floating cards ───────────────────────────────────── */}
+          {OUTPUTS.map(({ label, color }, i) => {
+            const oCy = OUT_CYS[i]
+            const f   = OUT_FLOATS[i]
+            const cardY = oCy - 30
 
-              {/* Output card */}
-              <rect x="640" y={y - 20} width="246" height="40"
-                fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)"
-                strokeWidth="1" rx="7" />
+            return (
+              <g key={label}>
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values={f.dy}
+                  dur={f.dur}
+                  begin={f.begin}
+                  repeatCount="indefinite"
+                  calcMode="spline"
+                  keyTimes="0;0.5;1"
+                  keySplines="0.45 0 0.55 1;0.45 0 0.55 1"
+                />
 
-              {/* Color dot indicator */}
-              <circle cx="659" cy={y} r="6" fill={dot} opacity="0.85" />
+                {/* Card */}
+                <rect
+                  x={OUT_X} y={cardY}
+                  width={OUT_W} height="60"
+                  rx="10"
+                  fill="rgba(255,255,255,0.04)"
+                  stroke="rgba(255,255,255,0.10)"
+                  strokeWidth="1"
+                />
 
-              {/* Label */}
-              <text x="674" y={y + 4} fill="rgba(255,255,255,0.82)"
-                fontSize="11.5" fontFamily="system-ui,sans-serif">
-                {label}
-              </text>
-            </g>
-          ))}
+                {/* Color dot */}
+                <circle cx={OUT_X + 20} cy={oCy} r="6" fill={color} opacity="0.9" />
+
+                {/* Label */}
+                <text
+                  x={OUT_X + 34} y={oCy + 4}
+                  fill="rgba(255,255,255,0.85)"
+                  fontSize="11.5"
+                  fontFamily="system-ui,sans-serif"
+                >
+                  {label}
+                </text>
+
+                {/* Entry dot */}
+                <circle cx={OUT_X} cy={oCy} r="3" fill={color} opacity="0.4" />
+              </g>
+            )
+          })}
 
         </svg>
       </div>

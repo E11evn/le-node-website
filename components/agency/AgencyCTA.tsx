@@ -11,7 +11,7 @@ export default function AgencyCTA() {
           Book a 30-minute strategy call. We'll show you exactly where your GTM is leaking — and what to do about it.
         </p>
         <Link
-          href="/contact"
+          href="/book"
           className="inline-flex items-center justify-center px-8 py-4 bg-white font-semibold rounded-lg text-base hover:bg-orange-50 transition-colors"
           style={{ color: '#FA7900' }}
         >

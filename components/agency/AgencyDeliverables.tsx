@@ -119,7 +119,7 @@ export default function AgencyDeliverables() {
                   </li>
                 ))}
               </ul>
-              <a href="/contact" className="btn-agency w-full justify-center">
+              <a href="/book" className="btn-agency w-full justify-center">
                 Start with an audit
               </a>
             </div>
@@ -149,7 +149,7 @@ export default function AgencyDeliverables() {
                 ))}
               </ul>
               <a
-                href="/contact"
+                href="/book"
                 className="inline-flex items-center justify-center w-full px-5 py-2.5 bg-white font-semibold rounded-lg text-sm hover:bg-orange-50 transition-colors"
                 style={{ color: '#FA7900' }}
               >
