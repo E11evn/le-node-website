@@ -44,46 +44,78 @@ const phases = [
 
 export default function AgencyApproach() {
   return (
-    <section id="approach">
-      <div className="container-content">
-        <span className="text-xs font-semibold tracking-widest uppercase mb-4 block" style={{ color: '#FA7900' }}>
-          Our Method
-        </span>
-        <h2 className="text-display-sm font-bold text-foreground mb-4 max-w-2xl">
-          Audit. Implement. Execute. Fast.
-        </h2>
-        <p className="text-muted text-lg mb-16 max-w-xl">
-          We don&apos;t hand you a deck and disappear. We build the system and run it
-          alongside your team until it works.
-        </p>
+    <section id="approach" className="!py-0">
 
-        <div className="grid md:grid-cols-3 gap-8 relative">
-          {/* Connector line */}
-          <div className="hidden md:block absolute top-8 left-[16.66%] right-[16.66%] h-px bg-border" />
-
-          {phases.map(({ number, label, title, description, deliverables }) => (
-            <div key={number} className="relative">
+      {/* ── Schedule header strip ─────────────────────────────────────── */}
+      <div style={{ background: 'linear-gradient(to right, #FA7900, #FA9E00)' }}>
+        <div className="container-content">
+          <div className="hidden md:grid grid-cols-3">
+            {phases.map((phase, i) => (
               <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-lg text-white mb-6 relative z-10"
-                style={{ background: 'linear-gradient(to bottom right, #FA7900, #FA9E00)' }}
+                key={phase.number}
+                className={`py-5 flex flex-col items-start ${
+                  i < phases.length - 1 ? 'border-r border-white/20' : ''
+                }`}
+                style={{ paddingLeft: i === 0 ? 0 : '2rem', paddingRight: i === phases.length - 1 ? 0 : '2rem' }}
               >
-                {number}
+                <span className="text-white/60 text-xs font-mono font-semibold uppercase tracking-widest mb-0.5">
+                  {phase.label}
+                </span>
+                <span className="text-white font-bold text-lg">{phase.title}</span>
               </div>
-              <p className="text-xs font-medium uppercase tracking-widest text-muted mb-1">{label}</p>
-              <h3 className="font-bold text-foreground text-xl mb-3">{title}</h3>
-              <p className="text-muted text-sm leading-relaxed mb-5">{description}</p>
-              <ul className="space-y-1.5">
-                {deliverables.map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm text-muted">
-                    <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: '#FA7900' }} />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Mobile: single label */}
+          <div className="md:hidden py-4">
+            <span className="text-white/70 text-xs font-mono font-semibold uppercase tracking-widest">
+              Program schedule
+            </span>
+          </div>
         </div>
       </div>
+
+      {/* ── Phase content ─────────────────────────────────────────────── */}
+      <div className="border-b border-border">
+        <div className="container-content">
+          <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
+            {phases.map((phase, i) => (
+              <div
+                key={phase.number}
+                className="py-10 md:py-12"
+                style={{ paddingLeft: i === 0 ? 0 : '2rem', paddingRight: i === phases.length - 1 ? 0 : '2rem' }}
+              >
+                {/* Phase number badge */}
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-base mb-5"
+                  style={{ background: 'linear-gradient(135deg, #FA7900, #FA9E00)' }}
+                >
+                  {phase.number}
+                </div>
+
+                {/* Mobile label */}
+                <p className="md:hidden text-xs font-mono font-semibold uppercase tracking-widest mb-2"
+                  style={{ color: '#FA7900' }}>
+                  {phase.label}
+                </p>
+
+                <h3 className="font-bold text-foreground text-xl mb-3">{phase.title}</h3>
+                <p className="text-muted text-sm leading-relaxed mb-6">{phase.description}</p>
+
+                <ul className="space-y-2">
+                  {phase.deliverables.map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-muted">
+                      <span className="mt-0.5 flex-shrink-0" style={{ color: '#FA7900' }}>→</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
     </section>
   )
 }

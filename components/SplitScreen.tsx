@@ -10,7 +10,7 @@ export default function SplitScreen() {
       >
         <div className="flex flex-col items-center text-center px-8">
           <span className="text-5xl md:text-7xl lg:text-8xl font-bold text-white tracking-tight leading-none">
-            le node AI
+            le node <span style={{ color: '#0000FA' }}>AI</span>
           </span>
           <span className="mt-4 text-base md:text-lg text-white/50 underline underline-offset-4 decoration-white/30 tracking-wide">
             AI native GTM OS
@@ -34,7 +34,7 @@ export default function SplitScreen() {
           <span className="text-5xl md:text-7xl lg:text-8xl font-bold text-white tracking-tight leading-none">
             le node
             <br />
-            Consulting
+            <span style={{ color: '#FA7900' }}>Consulting</span>
           </span>
           <span className="mt-4 text-base md:text-lg text-white/50 underline underline-offset-4 decoration-white/30 tracking-wide">
             Audit, Implement, Execute. Fast.

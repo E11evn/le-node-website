@@ -21,7 +21,7 @@ export default function Hero() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/contact" className="btn-primary text-base px-6 py-3">
-            Get started
+            Join waitlist
           </Link>
           <a href="#how-it-works" className="btn-secondary text-base px-6 py-3">
             See how it works

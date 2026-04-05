@@ -27,21 +27,23 @@ export default function Nav() {
         <div className="flex items-center gap-1 rounded-full bg-white/5 p-1">
           <Link
             href="/product"
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ease-in-out ${
               !isAgency
-                ? 'bg-[#0000FA] text-white'
-                : 'text-white/50 hover:text-white'
+                ? 'text-white shadow-sm'
+                : 'text-white/40 hover:text-white/70'
             }`}
+            style={!isAgency ? { background: '#0000FA' } : {}}
           >
             le node
           </Link>
           <Link
             href="/agency"
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ease-in-out ${
               isAgency
-                ? 'bg-[#FA7900] text-white'
-                : 'text-white/50 hover:text-white'
+                ? 'text-white shadow-sm'
+                : 'text-white/40 hover:text-white/70'
             }`}
+            style={isAgency ? { background: '#FA7900' } : {}}
           >
             agency
           </Link>
@@ -54,7 +56,7 @@ export default function Nav() {
           </Link>
         ) : (
           <Link href="/contact" className="btn-primary">
-            Get started
+            Join waitlist
           </Link>
         )}
       </nav>
