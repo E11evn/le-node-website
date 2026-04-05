@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 
 export default function Nav() {
   const pathname = usePathname()
-  const isAgency = pathname.startsWith('/agency')
+  const isAgency = pathname.startsWith('/agency') || pathname === '/book'
 
   return (
     <header className="sticky top-0 z-50 bg-[#212226] border-b border-white/10">
@@ -51,7 +51,7 @@ export default function Nav() {
 
         {/* Right: Context-aware CTA */}
         {isAgency ? (
-          <Link href="/contact" className="btn-agency">
+          <Link href="/book" className="btn-agency">
             Book a call
           </Link>
         ) : (

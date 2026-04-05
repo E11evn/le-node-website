@@ -11,8 +11,7 @@ export const metadata: Metadata = {
 // Paste your Google Calendar Appointment Scheduling link here.
 // It looks like: https://calendar.google.com/calendar/appointments/schedules/XXXX
 // ─────────────────────────────────────────────────────────────────────────────
-const BOOKING_URL =
-  'https://calendar.google.com/calendar/appointments/schedules/REPLACE_WITH_YOUR_LINK'
+const BOOKING_URL = 'https://calendar.app.google/PKVWjnBnDGqyk5xg6'
 
 export default function BookPage() {
   return (

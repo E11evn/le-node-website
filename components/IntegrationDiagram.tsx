@@ -61,42 +61,47 @@ function Logo({ id, x, y, s = 22 }: { id: string; x: number; y: number; s?: numb
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 const INPUTS = [
-  { label: 'Signals',   logos: ['clay', 'linkedin', 'claude']      },
-  { label: 'Inbound',   logos: ['typeform', 'webflow', 'hubspot']   },
-  { label: 'Ads',       logos: ['gads', 'liads', 'fbads']           },
-  { label: 'Events',    logos: ['webhook', 'n8n', 'clay']           },
-  { label: 'Website',   logos: ['ga4', 'segment', 'hotjar']         },
-  { label: 'Database',  logos: ['supabase', 'bigquery', 'db']       },
+  { label: 'Signals',   logos: ['clay', 'linkedin', 'claude']         },
+  { label: 'Inbound',   logos: ['typeform', 'webflow', 'hubspot']      },
+  { label: 'Ads',       logos: ['gads', 'liads', 'fbads']              },
+  { label: 'Events',    logos: ['webhook', 'n8n', 'clay']              },
+  { label: 'Website',   logos: ['ga4', 'segment', 'hotjar']            },
+  { label: 'Database',  logos: ['supabase', 'bigquery', 'db']          },
   { label: 'Providers', logos: ['apollo', 'fullenrich', 'dropcontact'] },
 ]
 
 const OUTPUTS = [
-  { label: 'CRM',                color: '#FF7A59' },
-  { label: 'Qualified Leads',    color: ACCENT     },
-  { label: 'Sales Enablement',   color: '#52BD94' },
-  { label: 'Sales Ready Opp.',   color: '#F59E0B' },
+  { label: 'CRM',              color: '#FF7A59' },
+  { label: 'Qualified Leads',  color: ACCENT    },
+  { label: 'Sales Enablement', color: '#52BD94' },
+  { label: 'Sales Ready Opp.', color: '#F59E0B' },
 ]
 
 // Card geometry
-const CARD_W  = 162
-const CARD_H  = 68
-const GAP_Y   = 10
-const CARD_X  = 28                                 // left edge of input cards
-const HUB_X   = 388                                // left edge of le-node card
-const HUB_W   = 184
-const HUB_H   = 128
-const HUB_CY  = 264                                // vertical centre of le-node card
-const OUT_X   = 694                                // left edge of output cards
-const OUT_W   = 184
+const CARD_W = 162
+const CARD_H = 68
+const HUB_X  = 388
+const HUB_W  = 184
+const HUB_H  = 128
+const HUB_CY = 264
+const OUT_X  = 694
+const OUT_W  = 184
 
-// Input card top-Y for each row
-function inputY(i: number) { return 12 + i * (CARD_H + GAP_Y) }
-function inputCY(i: number) { return inputY(i) + CARD_H / 2 }
+// Scattered positions — varied x/y to give a "floating in space" feel
+const CARD_POSITIONS = [
+  { x: 10, y: 12  },  // Signals
+  { x: 54, y: 92  },  // Inbound
+  { x: 6,  y: 174 },  // Ads
+  { x: 58, y: 255 },  // Events
+  { x: 10, y: 338 },  // Website
+  { x: 50, y: 418 },  // Database
+  { x: 8,  y: 490 },  // Providers
+]
 
-// Output card centres (4 cards, evenly spaced around HUB_CY)
+// Output card vertical centres
 const OUT_CYS = [HUB_CY - 105, HUB_CY - 35, HUB_CY + 35, HUB_CY + 105]
 
-// Float animation params per card
+// Float animation params per card (logos only)
 const FLOATS = [
   { dy: '0,0; 0,-7; 0,0',       dur: '4.6s', begin: '0s'    },
   { dy: '0,-3; 0,5; 0,-3',      dur: '5.2s', begin: '-1.1s' },
@@ -114,11 +119,14 @@ const OUT_FLOATS = [
 ]
 
 export default function IntegrationDiagram() {
-  const inputRight  = CARD_X + CARD_W                // x=190
-  const hubLeft     = HUB_X                          // x=388
-  const hubRight    = HUB_X + HUB_W                  // x=572
-  const hubTop      = HUB_CY - HUB_H / 2            // y=200
-  const outLeft     = OUT_X                          // x=694
+  const hubLeft  = HUB_X
+  const hubRight = HUB_X + HUB_W
+  const hubTop   = HUB_CY - HUB_H / 2
+  const outLeft  = OUT_X
+
+  const logoSize  = 22
+  const logoGap   = 8
+  const logoTotal = 3 * logoSize + 2 * logoGap
 
   return (
     <section className="py-20 md:py-28 bg-[#212226]">
@@ -143,7 +151,7 @@ export default function IntegrationDiagram() {
 
         {/* Diagram */}
         <svg
-          viewBox={`0 0 900 ${12 + 7 * (CARD_H + GAP_Y) - GAP_Y + 12}`}
+          viewBox="0 0 900 560"
           width="100%"
           xmlns="http://www.w3.org/2000/svg"
           style={{ display: 'block', maxWidth: 900, margin: '0 auto' }}
@@ -186,12 +194,14 @@ export default function IntegrationDiagram() {
 
           {/* Input → le-node paths (convergence) */}
           {INPUTS.map((_, i) => {
-            const cy = inputCY(i)
+            const { x: cardX, y: cardY } = CARD_POSITIONS[i]
+            const cardRight = cardX + CARD_W
+            const cy = cardY + CARD_H / 2
             const delay = `${-(i * 0.2).toFixed(1)}s`
             return (
               <path
                 key={`in-path-${i}`}
-                d={`M ${inputRight} ${cy} C ${(inputRight + hubLeft) / 2} ${cy} ${(inputRight + hubLeft) / 2} ${HUB_CY} ${hubLeft} ${HUB_CY}`}
+                d={`M ${cardRight} ${cy} C ${(cardRight + hubLeft) / 2} ${cy} ${(cardRight + hubLeft) / 2} ${HUB_CY} ${hubLeft} ${HUB_CY}`}
                 style={{ ...FLOW, animationDelay: delay }}
               />
             )
@@ -212,42 +222,25 @@ export default function IntegrationDiagram() {
 
           {/* ── Input floating cards ────────────────────────────────────── */}
           {INPUTS.map(({ label, logos }, i) => {
-            const cy  = inputY(i)
-            const cx  = CARD_X + CARD_W / 2
-            const f   = FLOATS[i]
-            // 3 logos centred in card
-            const logoSize  = 22
-            const logoGap   = 8
-            const logoTotal = 3 * logoSize + 2 * logoGap
-            const logoStartX = CARD_X + (CARD_W - logoTotal) / 2
+            const { x: cardX, y: cardY } = CARD_POSITIONS[i]
+            const cardRight = cardX + CARD_W
+            const cardCX = cardX + CARD_W / 2
+            const f = FLOATS[i]
+            const logoStartX = cardX + (CARD_W - logoTotal) / 2
 
             return (
               <g key={label}>
-                <animateTransform
-                  attributeName="transform"
-                  type="translate"
-                  values={f.dy}
-                  dur={f.dur}
-                  begin={f.begin}
-                  repeatCount="indefinite"
-                  calcMode="spline"
-                  keyTimes={f.dy.split(';').map((_, j, a) => (j / (a.length - 1)).toFixed(2)).join(';')}
-                  keySplines={Array(f.dy.split(';').length - 1).fill('0.45 0 0.55 1').join(';')}
-                />
-
-                {/* Card bg */}
+                {/* Static: card background, label, separator, connection dot */}
                 <rect
-                  x={CARD_X} y={cy}
+                  x={cardX} y={cardY}
                   width={CARD_W} height={CARD_H}
                   rx="10"
                   fill="rgba(255,255,255,0.04)"
                   stroke="rgba(255,255,255,0.10)"
                   strokeWidth="1"
                 />
-
-                {/* Category label */}
                 <text
-                  x={cx} y={cy + 20}
+                  x={cardCX} y={cardY + 20}
                   textAnchor="middle"
                   fill="rgba(255,255,255,0.90)"
                   fontSize="11"
@@ -256,30 +249,39 @@ export default function IntegrationDiagram() {
                 >
                   {label}
                 </text>
-
-                {/* Separator */}
                 <line
-                  x1={CARD_X + 10} y1={cy + 29}
-                  x2={CARD_X + CARD_W - 10} y2={cy + 29}
+                  x1={cardX + 10} y1={cardY + 29}
+                  x2={cardX + CARD_W - 10} y2={cardY + 29}
                   stroke="rgba(255,255,255,0.07)" strokeWidth="1"
                 />
-
-                {/* 3 logos */}
-                {logos.map((id, li) => (
-                  <Logo
-                    key={id + li}
-                    id={id}
-                    x={logoStartX + li * (logoSize + logoGap)}
-                    y={cy + 36}
-                    s={logoSize}
-                  />
-                ))}
-
-                {/* Connection dot */}
                 <circle
-                  cx={inputRight} cy={cy + CARD_H / 2}
+                  cx={cardRight} cy={cardY + CARD_H / 2}
                   r="3" fill={ACCENT} opacity="0.4"
                 />
+
+                {/* Logos only — these float */}
+                <g>
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    values={f.dy}
+                    dur={f.dur}
+                    begin={f.begin}
+                    repeatCount="indefinite"
+                    calcMode="spline"
+                    keyTimes={f.dy.split(';').map((_, j, a) => (j / (a.length - 1)).toFixed(2)).join(';')}
+                    keySplines={Array(f.dy.split(';').length - 1).fill('0.45 0 0.55 1').join(';')}
+                  />
+                  {logos.map((id, li) => (
+                    <Logo
+                      key={id + li}
+                      id={id}
+                      x={logoStartX + li * (logoSize + logoGap)}
+                      y={cardY + 36}
+                      s={logoSize}
+                    />
+                  ))}
+                </g>
               </g>
             )
           })}
@@ -330,16 +332,16 @@ export default function IntegrationDiagram() {
             <image
               href="/logo.png"
               x={HUB_X + (HUB_W - 120) / 2}
-              y={hubTop + 22}
+              y={hubTop + 30}
               width="120"
               height="38"
               preserveAspectRatio="xMidYMid meet"
             />
 
-            {/* Subtitle */}
+            {/* Tagline */}
             <text
               x={HUB_X + HUB_W / 2}
-              y={hubTop + 76}
+              y={hubTop + 86}
               textAnchor="middle"
               fill="rgba(255,255,255,0.40)"
               fontSize="9.5"
@@ -348,31 +350,6 @@ export default function IntegrationDiagram() {
             >
               AI native GTM Engine
             </text>
-
-            {/* Process pills */}
-            {['Identify', 'Enrich', 'Score', 'Route'].map((step, i) => (
-              <g key={step}>
-                <rect
-                  x={HUB_X + 10 + i * 40} y={hubTop + 88}
-                  width="36" height="20"
-                  rx="5"
-                  fill="rgba(0,67,250,0.22)"
-                  stroke="rgba(0,67,250,0.4)"
-                  strokeWidth="1"
-                />
-                <text
-                  x={HUB_X + 10 + i * 40 + 18}
-                  y={hubTop + 102}
-                  textAnchor="middle"
-                  fill="rgba(255,255,255,0.80)"
-                  fontSize="7.5"
-                  fontWeight="600"
-                  fontFamily="system-ui,sans-serif"
-                >
-                  {step}
-                </text>
-              </g>
-            ))}
 
             {/* Entry / exit dots */}
             <circle cx={hubLeft}  cy={HUB_CY} r="4" fill={ACCENT} opacity="0.55" />
