@@ -1,11 +1,17 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 
 export default function Nav() {
+  const pathname = usePathname()
+  const isAgency = pathname.startsWith('/agency')
+
   return (
     <header className="sticky top-0 z-50 bg-[#212226] border-b border-white/10">
       <nav className="container-content flex items-center justify-between h-16">
+
+        {/* Left: Logo */}
         <Link href="/" className="flex items-center">
           <Image
             src="/logo.png"
@@ -17,30 +23,40 @@ export default function Nav() {
           />
         </Link>
 
-        <div className="hidden md:flex items-center gap-8">
+        {/* Center: Mode toggle */}
+        <div className="flex items-center gap-1 rounded-full bg-white/5 p-1">
           <Link
-            href="#how-it-works"
-            className="text-sm text-white/60 hover:text-white transition-colors"
+            href="/product"
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+              !isAgency
+                ? 'bg-[#0000FA] text-white'
+                : 'text-white/50 hover:text-white'
+            }`}
           >
-            How it works
+            le node
           </Link>
           <Link
-            href="#use-cases"
-            className="text-sm text-white/60 hover:text-white transition-colors"
+            href="/agency"
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+              isAgency
+                ? 'bg-[#FA7900] text-white'
+                : 'text-white/50 hover:text-white'
+            }`}
           >
-            Use cases
-          </Link>
-          <Link
-            href="/contact"
-            className="text-sm text-white/60 hover:text-white transition-colors"
-          >
-            Contact
+            agency
           </Link>
         </div>
 
-        <Link href="/contact" className="btn-primary">
-          Get started
-        </Link>
+        {/* Right: Context-aware CTA */}
+        {isAgency ? (
+          <Link href="/contact" className="btn-agency">
+            Book a call
+          </Link>
+        ) : (
+          <Link href="/contact" className="btn-primary">
+            Get started
+          </Link>
+        )}
       </nav>
     </header>
   )

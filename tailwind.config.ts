@@ -11,11 +11,15 @@ const config: Config = {
       colors: {
         background: '#FFFFFF',
         foreground: '#212226',
-        accent: '#0E34F4',
+        accent: '#0000FA',
         'accent-light': '#EBF0FF',
         border: '#E5E7EB',
         muted: '#6B7280',
         dark: '#212226',
+        product: '#0000FA',
+        'product-to': '#0043FA',
+        agency: '#FA7900',
+        'agency-to': '#FA9E00',
       },
       fontFamily: {
         sans: ['var(--font-geist-sans)', 'Inter', 'system-ui', 'sans-serif'],

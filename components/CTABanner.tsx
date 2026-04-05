@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function CTABanner() {
   return (
-    <section className="bg-accent !py-0">
+    <section className="!py-0" style={{ background: 'linear-gradient(to right, #0000FA, #0043FA)' }}>
       <div className="container-content py-20 md:py-24 text-center">
         <h2 className="text-display-sm font-bold text-white mb-4">
           Ready to automate your GTM?
@@ -12,7 +12,7 @@ export default function CTABanner() {
         </p>
         <Link
           href="/contact"
-          className="inline-flex items-center justify-center px-8 py-4 bg-white text-accent font-semibold rounded-lg text-base hover:bg-blue-50 transition-colors"
+          className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#0000FA] font-semibold rounded-lg text-base hover:bg-blue-50 transition-colors"
         >
           Get in touch →
         </Link>
