@@ -18,13 +18,13 @@ export default function SplitScreen() {
           className="object-cover"
           priority
         />
-        {/* Permanent dark layer */}
-        <div className="absolute inset-0 bg-black/65" />
+        {/* Permanent dark layer — heavy so image is subtle */}
+        <div className="absolute inset-0 bg-black/82" />
         {/* Hover colour tint */}
         <div className="absolute inset-0 bg-[#0000FA]/0 group-hover:bg-[#0000FA]/30 transition-colors duration-500" />
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center text-center px-8">
+        <div className="relative z-10 flex flex-col items-center text-center px-8 transition-transform duration-500 ease-in-out group-hover:scale-[1.30]">
           <span className="text-5xl md:text-7xl lg:text-8xl font-bold text-white tracking-tight leading-none">
             le node <span style={{ color: '#0000FA' }}>OS</span>
           </span>
@@ -55,12 +55,12 @@ export default function SplitScreen() {
           priority
         />
         {/* Permanent dark layer */}
-        <div className="absolute inset-0 bg-black/65" />
+        <div className="absolute inset-0 bg-black/82" />
         {/* Hover colour tint */}
         <div className="absolute inset-0 bg-[#FA7900]/0 group-hover:bg-[#FA7900]/25 transition-colors duration-500" />
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center text-center px-8">
+        <div className="relative z-10 flex flex-col items-center text-center px-8 transition-transform duration-500 ease-in-out group-hover:scale-[1.30]">
           <span className="text-5xl md:text-7xl lg:text-8xl font-bold text-white tracking-tight leading-none">
             le node
             <br />

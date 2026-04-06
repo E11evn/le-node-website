@@ -111,6 +111,14 @@ export default function IntegrationDiagram() {
             <style>{`
               @keyframes flow-anim { to { stroke-dashoffset: -14; } }
             `}</style>
+            {/* Clip path matching the hub card's rounded rect */}
+            <clipPath id="hub-clip">
+              <rect
+                x={HUB_X} y={hubTop}
+                width={HUB_W} height={HUB_H}
+                rx="14"
+              />
+            </clipPath>
           </defs>
 
           {/* Subtle dot grid */}
@@ -224,14 +232,15 @@ export default function IntegrationDiagram() {
               fill={ACCENT}
             />
 
-            {/* le-node logo — fills the full hub card */}
+            {/* le-node logo — sliced to fill the full hub card, clipped to rounded corners */}
             <image
               href="/logos/le-node-alt.png"
               x={HUB_X}
               y={hubTop}
               width={HUB_W}
               height={HUB_H}
-              preserveAspectRatio="xMidYMid meet"
+              preserveAspectRatio="xMidYMid slice"
+              clipPath="url(#hub-clip)"
             />
 
             {/* Entry / exit dots */}
