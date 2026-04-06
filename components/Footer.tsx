@@ -16,13 +16,13 @@ export default function Footer() {
             Agence
           </Link>
           <Link href="/about" className="text-sm text-muted hover:text-foreground transition-colors">
-            À propos
+            About
           </Link>
           <Link href="/legal" className="text-sm text-muted hover:text-foreground transition-colors">
-            Mentions légales
+            Legal notice
           </Link>
           <Link href="/privacy" className="text-sm text-muted hover:text-foreground transition-colors">
-            Confidentialité
+            Privacy
           </Link>
         </div>
 
