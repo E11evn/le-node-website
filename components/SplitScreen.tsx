@@ -10,7 +10,7 @@ export default function SplitScreen() {
         href="/os"
         className="group relative flex flex-1 flex-col items-center justify-center"
       >
-        <Image src="/bg-os.png" alt="" fill className="object-cover" priority />
+        <Image src="/bgos.jpg" alt="" fill className="object-cover" priority />
         {/* Dark overlay — 85% so image is very subtle */}
         <div className="absolute inset-0 bg-black/[0.85]" />
         {/* Faint blue tint on hover */}

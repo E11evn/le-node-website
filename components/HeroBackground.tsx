@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
-// ── Tool positions (% of container, derived from reference layout) ─────────────
+// Tool positions as % of container — matched from reference images
 const TOOLS = [
   { id: 'google',      x: 44, y: 10 },
   { id: 'pipedrive',   x: 68, y: 11 },
@@ -28,139 +28,151 @@ const TOOLS = [
   { id: 'webhook',     x: 55, y: 93 },
 ]
 
-// Hub (le-node card) center as %
-const HUB = { x: 52, y: 52 }
-// Hub display size in px
+const HUB   = { x: 52, y: 52 }
 const HUB_W = 168
 const HUB_H = 108
-// Tool icon size in px
-const ICON_S = 40
+const ICON_S = 38   // logo image size inside the bg square
+const BOX_S  = 56   // #303030 rounded square outer size
 
-// Quadratic bezier control point — adds a gentle curve to each beam
+// Quadratic bezier from tool → hub, with a gentle curve
 function beamPath(tx: number, ty: number): string {
-  const cx = (tx + HUB.x) / 2 + (ty - HUB.y) * 0.15
-  const cy = (ty + HUB.y) / 2 - (tx - HUB.x) * 0.10
+  const cx = (tx + HUB.x) / 2 + (ty - HUB.y) * 0.12
+  const cy = (ty + HUB.y) / 2 - (tx - HUB.x) * 0.08
   return `M ${tx} ${ty} Q ${cx} ${cy} ${HUB.x} ${HUB.y}`
 }
 
 export default function HeroBackground() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const activeRef    = useRef<Set<number>>(new Set())
-  const hubCountRef  = useRef(0)
-  const timers       = useRef<ReturnType<typeof setTimeout>[]>([])
-  const runningRef   = useRef(true)
+  const activeRef   = useRef<Set<number>>(new Set())
+  const hubCountRef = useRef(0)
+  const timers      = useRef<ReturnType<typeof setTimeout>[]>([])
+  const rafs        = useRef<number[]>([])
+  const runningRef  = useRef(true)
 
   function t(fn: () => void, ms: number) {
-    const id = setTimeout(fn, ms)
+    const id = setTimeout(() => { if (runningRef.current) fn() }, ms)
     timers.current.push(id)
-    return id
   }
 
   useEffect(() => {
     runningRef.current = true
 
     function activate(i: number) {
-      if (!runningRef.current) return
       if (activeRef.current.has(i)) return
-
       activeRef.current.add(i)
 
       const toolEl = document.getElementById(`hb-tool-${i}`)
       const beamEl = document.getElementById(`hb-beam-${i}`) as SVGPathElement | null
       const hubEl  = document.getElementById('hb-hub')
 
-      // 1 — light up the tool
+      // Step 1: light up the tool icon
       if (toolEl) toolEl.style.opacity = '1'
 
-      // 2 — reset beam (no transition), then animate
+      // Step 2: arm the beam, then travel using rAF double-pump for reliable transition
       t(() => {
         if (!beamEl) return
-        beamEl.style.transition = 'none'
-        beamEl.style.strokeDashoffset = '1.2'
-        beamEl.style.opacity = '1'
+        // Disable transition, reset to start position
+        beamEl.style.setProperty('transition', 'none')
+        beamEl.style.setProperty('stroke-dashoffset', '1.2')
+        beamEl.style.setProperty('opacity', '1')
 
-        t(() => {
-          beamEl.style.transition = 'stroke-dashoffset 0.9s linear'
-          beamEl.style.strokeDashoffset = '-0.2'
-        }, 50)
-      }, 200)
+        // Double-rAF ensures the browser paints the reset state before starting transition
+        const raf1 = requestAnimationFrame(() => {
+          const raf2 = requestAnimationFrame(() => {
+            if (!runningRef.current) return
+            beamEl.style.setProperty('transition', 'stroke-dashoffset 0.85s linear')
+            beamEl.style.setProperty('stroke-dashoffset', '-0.2')
+          })
+          rafs.current.push(raf2)
+        })
+        rafs.current.push(raf1)
+      }, 150)
 
-      // 3 — activate hub when beam arrives
+      // Step 3: hub lights up when beam arrives (~150 + 850 = 1000ms)
       t(() => {
         hubCountRef.current++
         if (hubEl) hubEl.style.opacity = '1'
-      }, 1200)
+      }, 1050)
 
-      // 4 — deactivate after hold
+      // Step 4: fade everything back after a hold
       t(() => {
-        if (!runningRef.current) return
         if (toolEl) toolEl.style.opacity = '0.1'
         if (beamEl) {
-          beamEl.style.transition = 'opacity 0.4s ease'
-          beamEl.style.opacity = '0'
+          beamEl.style.setProperty('transition', 'opacity 0.5s ease')
+          beamEl.style.setProperty('opacity', '0')
         }
         hubCountRef.current = Math.max(0, hubCountRef.current - 1)
         t(() => {
           if (hubCountRef.current === 0 && hubEl) hubEl.style.opacity = '0.1'
           activeRef.current.delete(i)
-        }, 400)
+        }, 500)
       }, 2800)
     }
 
     function scheduleNext() {
-      if (!runningRef.current) return
-      const delay = 600 + Math.random() * 1400
+      const delay = 700 + Math.random() * 1300
       t(() => {
-        // pick a random tool that isn't currently active
-        const available = TOOLS.map((_, i) => i).filter(i => !activeRef.current.has(i))
+        const available = TOOLS.map((_, idx) => idx).filter(idx => !activeRef.current.has(idx))
         if (available.length > 0) {
-          const pick = available[Math.floor(Math.random() * available.length)]
-          activate(pick)
+          activate(available[Math.floor(Math.random() * available.length)])
         }
         scheduleNext()
       }, delay)
     }
 
-    // Start two parallel chains offset by 1.2s
+    // Two chains offset by 1.5s for natural-feeling concurrent activations
     scheduleNext()
-    t(scheduleNext, 1200)
+    t(scheduleNext, 1500)
 
     return () => {
       runningRef.current = false
       timers.current.forEach(clearTimeout)
+      rafs.current.forEach(cancelAnimationFrame)
       timers.current = []
+      rafs.current   = []
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div ref={containerRef} className="absolute inset-0 overflow-hidden select-none">
+    <div className="absolute inset-0 overflow-hidden select-none" style={{ background: '#1D1D22' }}>
 
-      {/* ── Tool logos ──────────────────────────────────────────────── */}
+      {/* ── Tool logos — each wrapped in a #303030 rounded square ──── */}
       {TOOLS.map((tool, i) => (
-        <img
+        <div
           key={tool.id}
           id={`hb-tool-${i}`}
-          src={`/logos/${tool.id}.png`}
-          alt=""
-          width={ICON_S}
-          height={ICON_S}
-          draggable={false}
           style={{
             position: 'absolute',
             left: `${tool.x}%`,
             top:  `${tool.y}%`,
             transform: 'translate(-50%, -50%)',
+            width:  BOX_S,
+            height: BOX_S,
+            background: '#303030',
+            borderRadius: 14,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             opacity: 0.1,
             transition: 'opacity 0.35s ease',
-            borderRadius: 8,
           }}
-        />
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`/logos/${tool.id}.png`}
+            alt=""
+            width={ICON_S}
+            height={ICON_S}
+            draggable={false}
+            style={{ display: 'block', borderRadius: 6 }}
+          />
+        </div>
       ))}
 
-      {/* ── le-node hub card ────────────────────────────────────────── */}
+      {/* ── le-node hub card ─────────────────────────────────────────── */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         id="hb-hub"
-        src="/reference for js animation/logolenodenotext.png"
+        src="/logos/le-node-notext.png"
         alt=""
         width={HUB_W}
         height={HUB_H}
@@ -172,11 +184,11 @@ export default function HeroBackground() {
           transform: 'translate(-50%, -50%)',
           opacity: 0.1,
           transition: 'opacity 0.3s ease',
-          borderRadius: 12,
+          borderRadius: 14,
         }}
       />
 
-      {/* ── SVG overlay: grid + beams ───────────────────────────────── */}
+      {/* ── SVG: grid lines + animated beams ─────────────────────────── */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none"
         viewBox="0 0 100 100"
@@ -184,17 +196,9 @@ export default function HeroBackground() {
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          {/* Beam gradient: transparent → blue → white glow at tip */}
-          <linearGradient id="beamGrad" x1="0%" y1="0%" x2="100%" y2="0%"
-            gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stopColor="#0043FA" stopOpacity="0" />
-            <stop offset="70%"  stopColor="#0043FA" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
-          </linearGradient>
-
-          {/* Glow filter */}
-          <filter id="beamGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="0.6" result="blur" />
+          {/* Glow filter for beams */}
+          <filter id="beamGlow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
@@ -202,39 +206,34 @@ export default function HeroBackground() {
           </filter>
         </defs>
 
-        {/* Background grid — 9 columns, 6 rows, matching reference */}
+        {/* Background grid — faint, matching reference */}
         {[1,2,3,4,5,6,7,8].map(i => (
-          <line
-            key={`vg-${i}`}
-            x1={i * (100/9)} y1="0"
-            x2={i * (100/9)} y2="100"
-            stroke="white" strokeOpacity="0.06" strokeWidth="0.15"
+          <line key={`vg-${i}`}
+            x1={i * (100/9)} y1="0" x2={i * (100/9)} y2="100"
+            stroke="white" strokeOpacity="0.05" strokeWidth="0.12"
           />
         ))}
         {[1,2,3,4,5].map(i => (
-          <line
-            key={`hg-${i}`}
-            x1="0" y1={i * (100/6)}
-            x2="100" y2={i * (100/6)}
-            stroke="white" strokeOpacity="0.06" strokeWidth="0.15"
+          <line key={`hg-${i}`}
+            x1="0" y1={i * (100/6)} x2="100" y2={i * (100/6)}
+            stroke="white" strokeOpacity="0.05" strokeWidth="0.12"
           />
         ))}
 
-        {/* Beam paths — one per tool, animated via stroke-dashoffset */}
+        {/* Beam paths — one per tool */}
         {TOOLS.map((tool, i) => (
           <path
-            key={`hb-beam-${i}`}
+            key={tool.id}
             id={`hb-beam-${i}`}
             d={beamPath(tool.x, tool.y)}
             fill="none"
-            stroke="url(#beamGrad)"
-            strokeWidth="0.35"
+            stroke="#0043FA"
+            strokeWidth="0.4"
             pathLength="1"
             strokeDasharray="0.18 1"
             strokeDashoffset="1.2"
             opacity="0"
             filter="url(#beamGlow)"
-            style={{ transition: 'none' }}
           />
         ))}
       </svg>

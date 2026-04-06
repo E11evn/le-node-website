@@ -4,8 +4,8 @@ import HeroBackground from './HeroBackground'
 export default function Hero() {
   return (
     <section
-      className="relative overflow-hidden min-h-[580px] bg-[#0D0E14] !border-t-0"
-      style={{ paddingTop: '6rem', paddingBottom: '4rem' }}
+      className="relative overflow-hidden bg-[#1D1D22] !border-t-0"
+      style={{ minHeight: '80vh', paddingTop: '6rem', paddingBottom: '4rem', display: 'flex', alignItems: 'center' }}
     >
       {/* Layer 1 — animated illustration */}
       <HeroBackground />
@@ -15,7 +15,7 @@ export default function Hero() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 62% 56% at 50% 50%, rgba(8,8,16,0.90) 0%, rgba(8,8,16,0.50) 55%, transparent 100%)',
+            'radial-gradient(ellipse 62% 56% at 50% 50%, rgba(29,29,34,0.95) 0%, rgba(29,29,34,0.55) 55%, transparent 100%)',
         }}
       />
 
