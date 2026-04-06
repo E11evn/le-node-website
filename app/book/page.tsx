@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 // Paste your Google Calendar Appointment Scheduling link here.
 // It looks like: https://calendar.google.com/calendar/appointments/schedules/XXXX
 // ─────────────────────────────────────────────────────────────────────────────
-const BOOKING_URL = 'https://calendar.app.google/PKVWjnBnDGqyk5xg6'
+const BOOKING_URL = 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ3Faaox17Cxqc2jgjFxGWDNSVzWnV7c5nYiWnSyndS3emNh2fUHLtFkrxQsht5PR9W94ReLK0vu'
 
 export default function BookPage() {
   return (
@@ -38,17 +38,13 @@ export default function BookPage() {
           </div>
 
           {/* Google Calendar embed */}
-          <div
-            className="rounded-2xl overflow-hidden border border-border shadow-sm"
-            style={{ minHeight: 650 }}
-          >
+          <div className="rounded-2xl overflow-hidden border border-border shadow-sm">
             <iframe
               src={`${BOOKING_URL}?gv=true`}
               style={{ border: 0 }}
               width="100%"
-              height="650"
+              height="600"
               frameBorder="0"
-              scrolling="no"
               title="Book a strategy call"
             />
           </div>

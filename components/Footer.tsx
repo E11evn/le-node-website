@@ -9,23 +9,20 @@ export default function Footer() {
         </Link>
 
         <div className="flex items-center gap-8">
-          <Link
-            href="/product"
-            className="text-sm text-muted hover:text-foreground transition-colors"
-          >
-            Product
+          <Link href="/os" className="text-sm text-muted hover:text-foreground transition-colors">
+            le node OS
           </Link>
-          <Link
-            href="/agency"
-            className="text-sm text-muted hover:text-foreground transition-colors"
-          >
-            Agency
+          <Link href="/agence" className="text-sm text-muted hover:text-foreground transition-colors">
+            Agence
           </Link>
-          <Link
-            href="/contact"
-            className="text-sm text-muted hover:text-foreground transition-colors"
-          >
-            Contact
+          <Link href="/about" className="text-sm text-muted hover:text-foreground transition-colors">
+            À propos
+          </Link>
+          <Link href="/legal" className="text-sm text-muted hover:text-foreground transition-colors">
+            Mentions légales
+          </Link>
+          <Link href="/privacy" className="text-sm text-muted hover:text-foreground transition-colors">
+            Confidentialité
           </Link>
         </div>
 

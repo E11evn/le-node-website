@@ -6,7 +6,7 @@ import AgencyDeliverables from '@/components/agency/AgencyDeliverables'
 import AgencyCTA from '@/components/agency/AgencyCTA'
 import Footer from '@/components/Footer'
 
-export default function AgencyPage() {
+export default function AgencePage() {
   return (
     <>
       <Nav />

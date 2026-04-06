@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 
 export default function Nav() {
   const pathname = usePathname()
-  const isAgency = pathname.startsWith('/agency') || pathname === '/book'
+  const isAgency = pathname.startsWith('/agence') || pathname === '/book'
 
   return (
     <header className="sticky top-0 z-50 bg-[#212226] border-b border-white/10">
@@ -26,7 +26,7 @@ export default function Nav() {
         {/* Center: Mode toggle */}
         <div className="flex items-center gap-1 rounded-full bg-white/5 p-1">
           <Link
-            href="/product"
+            href="/os"
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ease-in-out ${
               !isAgency
                 ? 'text-white shadow-sm'
@@ -34,10 +34,10 @@ export default function Nav() {
             }`}
             style={!isAgency ? { background: '#0000FA' } : {}}
           >
-            le node
+            le node OS
           </Link>
           <Link
-            href="/agency"
+            href="/agence"
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ease-in-out ${
               isAgency
                 ? 'text-white shadow-sm'
@@ -45,7 +45,7 @@ export default function Nav() {
             }`}
             style={isAgency ? { background: '#FA7900' } : {}}
           >
-            agency
+            agence
           </Link>
         </div>
 

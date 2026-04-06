@@ -37,7 +37,7 @@ const benefits = [
   },
 ]
 
-export default function ProductPage() {
+export default function OsPage() {
   return (
     <>
       <Nav />
