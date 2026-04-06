@@ -224,13 +224,13 @@ export default function IntegrationDiagram() {
               fill={ACCENT}
             />
 
-            {/* le-node logo (white version on blue bg) */}
+            {/* le-node logo — fills the full hub card */}
             <image
               href="/logos/le-node-alt.png"
-              x={HUB_X + (HUB_W - 160) / 2}
-              y={hubTop + (HUB_H - 50) / 2}
-              width="160"
-              height="50"
+              x={HUB_X}
+              y={hubTop}
+              width={HUB_W}
+              height={HUB_H}
               preserveAspectRatio="xMidYMid meet"
             />
 
