@@ -16,7 +16,24 @@
   }
 
   section {
-    @apply py-20 md:py-28 border-t border-border;
+    @apply py-20 md:py-28 relative;
+  }
+
+  /* Animated top border — replaces static border-t border-border.
+     Triggered by .line-visible class added via SectionLineObserver
+     when the section scrolls into view. Skipped on .no-top-line sections. */
+  section:not(.no-top-line)::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background-color: #E5E7EB;
+    transform: scaleX(0);
+    transform-origin: 0% 50%;
+    transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  section.line-visible:not(.no-top-line)::before {
+    transform: scaleX(1);
   }
 }
 

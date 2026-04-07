@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import './globals.css'
+import SectionLineObserver from '@/components/SectionLineObserver'
 
 export const metadata: Metadata = {
   title: 'le-node — GTM on autopilot',
@@ -30,6 +31,7 @@ export default function RootLayout({
             <div className="absolute right-0 top-0 bottom-0 w-px" style={{ background: 'rgba(128,128,128,0.18)' }} />
           </div>
         </div>
+        <SectionLineObserver />
         {children}
       </body>
     </html>
