@@ -34,7 +34,7 @@ export default function Nav() {
             }`}
             style={!isAgency ? { background: '#0000FA' } : {}}
           >
-            le node OS
+            le node
           </Link>
           <Link
             href="/agence"

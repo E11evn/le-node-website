@@ -21,11 +21,7 @@ export default function Hero() {
 
         {/* Primary CTA — future beam target from floating icons */}
         <div className="mb-10">
-          <Link
-            href="/waitlist"
-            className="inline-flex items-center justify-center px-12 py-5 rounded-full text-white text-lg font-semibold hover:opacity-90 transition-opacity duration-150"
-            style={{ background: 'linear-gradient(to right, #0000FA, #0043FA)' }}
-          >
+          <Link href="/waitlist" className="btn-primary text-base px-6 py-3">
             Join waitlist
           </Link>
         </div>
