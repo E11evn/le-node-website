@@ -21,41 +21,64 @@ On page load, 8 vertical + 5 horizontal lines animate from `scaleX/Y(0)` to `sca
 
 12 tool logos in `#F0F0F2` rounded boxes at positions from `public/reference for js animation/reference 100% opacity.png`.
 
-**Appear** (`hbIconAppear`): each icon scales in from 0.6→1 and fades from 0→0.6 opacity, staggered 80ms per icon using CSS `scale` individual transform property (avoids conflict with float).
+**Appear** (`hbIconAppear`): each icon scales in from 0.6→1 and fades from 0→1 opacity, staggered 80ms per icon using CSS `scale` individual transform property (avoids conflict with float).
 
 **Float** (`hbFloat0–4`): 5 float variants (6.5–9s loops) using CSS `translate` + `rotate` individual transform properties, applied round-robin. Floats begin 700ms after the icon's appear animation ends.
 
 > CSS individual transform properties (`scale`, `translate`, `rotate`) are used so appear and float animations target different properties and compose cleanly without conflict.
 
+**Opacity layering**: `hbIconAppear` ends at `opacity: 1`. A wrapping div holds `opacity: 0.6` at rest and transitions to `1.0` when activated — their product gives the correct resting brightness without fighting the CSS animation fill-mode.
+
 **Tools shown** (12 icons):
 `clay, dropcontact, salesforce, hubspot, google, slack, linkedin, webhook, notion, claude, apollo, pipedrive`
 
-Hub center position: `(52%, 52%)` — reserved for future beam animation target.
-
 ---
 
-## 2. Beam animation — PLANNED, NOT YET IMPLEMENTED
+## 2. Beam animation
 
-### Target layout (from `reference with CTA.png`)
+### Layout
 
-The hero layout is: **h1 → "Join waitlist" CTA pill → 2-line explanation**.
+The hero: **h1 → "Join waitlist" CTA → 2-line explanation** (flex-centered in `min-height: 80vh`).
 
-The CTA button ("Join waitlist") is the **beam target** — beams will travel from each floating tool icon toward the button, passing through it.
+The CTA button is the beam convergence point, approximated at `{ x: 50, y: 52 }` in the percentage coordinate space of the `HeroBackground` container.
 
-### Planned behavior
-- Every ~1–2s, a random tool icon brightens (opacity 0.6 → 1)
-- An animated element (orb or line) travels from the icon along a curved path toward the CTA button
-- The CTA button pulses/brightens when a beam arrives
-- Icon and beam fade back after a hold (~2.8s cycle total)
+### Cycle (~4.5s total, starts 2s after mount)
 
-### Technical approach (to implement)
-- The CTA button needs an `id` (e.g. `id="hb-cta-target"`) so JS can get its bounding rect
-- Beam paths computed from each tool's `(x%, y%)` to the button's center position (recalculated on resize)
-- SVG overlay with `preserveAspectRatio="none"` for beam paths
-- Orb travels using `getPointAtLength()` per `requestAnimationFrame` (same approach as CPU animation reference)
-- JS loop: `activate(i)` → brighten icon → animate orb → pulse CTA → fade back → `scheduleNext()`
+```
+Left tool activates  →  beam left→CTA  →  CTA glows  →  beam CTA→right  →  right tool activates  →  pause
+     900ms                  550ms             200ms            550ms                900ms              1300ms
+```
 
-> Note: The `HUB` constant and hub card were removed when the beam animation was stripped. The CTA button replaces the hub as the beam convergence point.
+Tools are selected round-robin from two groups:
+- **Left** (`x < 50%`): clay, dropcontact, google, linkedin, claude, apollo
+- **Right** (`x ≥ 50%`): salesforce, hubspot, slack, webhook, notion, pipedrive
+
+### Tool activation
+
+- Outer opacity wrapper: `0.6` at rest → `1.0` active (`transition: opacity 300ms ease`)
+- Box shadow: gains a blue ring (`rgba(0,0,250,0.25)`) + soft glow on activation
+- Pulse ring (`.hb-pulse-ring`): absolutely positioned sibling, expands from `scale(1)` to `scale(2.4)` and fades out over 700ms
+
+### Beam
+
+An SVG overlay (`viewBox="0 0 100 100"`, `preserveAspectRatio="none"`) covers the full background. Each beam is a `<g>` with two `<line>` elements sharing the same `stroke-dashoffset` draw animation:
+
+| Layer | Stroke | Width |
+|-------|--------|-------|
+| Glow  | `rgba(0,0,250,0.18)` | 5px |
+| Core  | `rgba(0,0,250,0.65)` | 1px |
+
+Both use `vector-effect="non-scaling-stroke"` so stroke width stays in CSS pixels regardless of SVG coordinate scaling. The `stroke-dasharray: 200` → `stroke-dashoffset: 200→0` animation draws the line from start to end over 550ms.
+
+Each beam is a new React element keyed by an incrementing counter, so the CSS animation re-triggers on every cycle without needing JS imperative control.
+
+### CTA glow
+
+A div (`.hb-cta-glow`) absolutely positioned at `left: 50%; top: 52%` with a radial gradient. It expands horizontally (`scaleX 0.5→1.3`) and fades over 700ms. Keyed by an incrementing counter so each beam arrival re-mounts it.
+
+### Grid line color
+
+Updated from `#9E9EB8` to `#E3E3EA` (lighter, cooler tone). Shimmer gradient updated to match.
 
 ---
 
