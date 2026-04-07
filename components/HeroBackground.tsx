@@ -208,16 +208,16 @@ export default function HeroBackground() {
 
         /* ── SVG beam (two-layer: glow + core) ──────────────────────────── */
         @keyframes hbBeamDraw {
-          from { stroke-dashoffset: 200; opacity: 0; }
+          from { stroke-dashoffset: 1; opacity: 0; }
           10%  { opacity: 1; }
           100% { stroke-dashoffset: 0;   opacity: 1; }
         }
         .hb-beam-glow {
-          stroke-dasharray: 200; stroke-dashoffset: 200;
+          stroke-dasharray: 1; stroke-dashoffset: 1;
           animation: hbBeamDraw 550ms ease-out forwards;
         }
         .hb-beam-core {
-          stroke-dasharray: 200; stroke-dashoffset: 200;
+          stroke-dasharray: 1; stroke-dashoffset: 1;
           animation: hbBeamDraw 550ms ease-out forwards;
         }
       `}</style>
@@ -264,6 +264,7 @@ export default function HeroBackground() {
             <line
               className="hb-beam-glow"
               x1={beamOut.x1} y1={beamOut.y1} x2={beamOut.x2} y2={beamOut.y2}
+              pathLength="1"
               stroke="rgba(0,0,250,0.18)" strokeWidth="5" strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
             />
@@ -271,6 +272,7 @@ export default function HeroBackground() {
             <line
               className="hb-beam-core"
               x1={beamOut.x1} y1={beamOut.y1} x2={beamOut.x2} y2={beamOut.y2}
+              pathLength="1"
               stroke="rgba(0,0,250,0.65)" strokeWidth="1" strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
             />
@@ -281,12 +283,14 @@ export default function HeroBackground() {
             <line
               className="hb-beam-glow"
               x1={beamIn.x1} y1={beamIn.y1} x2={beamIn.x2} y2={beamIn.y2}
+              pathLength="1"
               stroke="rgba(0,0,250,0.18)" strokeWidth="5" strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
             />
             <line
               className="hb-beam-core"
               x1={beamIn.x1} y1={beamIn.y1} x2={beamIn.x2} y2={beamIn.y2}
+              pathLength="1"
               stroke="rgba(0,0,250,0.65)" strokeWidth="1" strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
             />
