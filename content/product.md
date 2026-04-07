@@ -13,12 +13,28 @@
 
 ## Hero (`components/Hero.tsx`)
 
-- Badge: `AI-native GTM automation`
+- Badge: `AI-native GTM OS`
 - Headline line 1: `Your entire GTM motion.`
 - Headline line 2 (accent): `On autopilot.`
 - Subheadline: `le-node handles the research, outreach, and enrichment — so your team focuses on closing. No code. No complexity. Just pipeline.`
 - CTA primary: `Get started` → `/contact`
 - CTA secondary: `See how it works` → `#how-it-works`
+- Theme: **light** — white background, `#1D1D22` headline, `gray-500` subtext, `#EEF2FF / #0043FA` badge
+
+### Hero Background Animation (`components/HeroBackground.tsx`)
+
+Animated background layer behind the hero text. Three animation layers combined:
+
+1. **Grid lines appear** — 8 vertical + 5 horizontal lines (`#9E9EB8`) animate in from scale 0 on page load with staggered delays and a shimmer pulse. Positions match `reference grid.svg`.
+
+2. **Tool icons float** — 12 tool logos in `#F0F0F2` rounded boxes appear with a staggered scale-in (80ms per icon), then float continuously with individual y/x/rotation loops (6.5–9s). No mouse interaction.
+
+3. **Beam + orb animation** — Every 0.7–2s a random icon lights up (opacity → 1), a blue `#0043FA` dot travels along a quadratic bezier path to the le-node hub card using `getPointAtLength()` per frame (CPU-animation approach), and the hub card lights up on arrival. Everything fades back after a hold.
+
+Tools shown (positions from `reference 100% opacity.png`):
+`clay, dropcontact, salesforce, hubspot, google, slack, linkedin, webhook, notion, claude, apollo, pipedrive`
+
+Hub: `le-node-notext.png` in a `#F0F0F2` rounded card, centered at (52%, 52%).
 
 ---
 
@@ -37,7 +53,7 @@
 
 ## Integration Diagram (`components/IntegrationDiagram.tsx`)
 
-- Title: `One system. Every lead.`
+- Title: `Your entire GTM motion. On autopilot`
 - Nodes: Inbound Signals, Prospect Lists, le-node Hub, CRM, Sales Outreach
 
 ---
