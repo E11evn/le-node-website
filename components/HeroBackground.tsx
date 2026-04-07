@@ -77,33 +77,33 @@ export default function HeroBackground() {
         setPulseRing(null)
         await w(100); if (!alive.current) break
 
-        // ── Phase 2: Grey line draws from nodeloader → left tool ──────────────
+        // ── Phase 2: Grey dots appear node → left tool (cover peels away) ───
         lKey.current++
         setGreyLine({ x1: NODE.x, y1: NODE.y, x2: lt.x, y2: lt.y, phase: 'draw', key: lKey.current })
-        await w(500); if (!alive.current) break
+        await w(400); if (!alive.current) break
 
         // ── Phase 3: Colored beam travels from left tool → nodeloader ─────────
         lKey.current++
         setColorBeam({ x1: lt.x, y1: lt.y, x2: NODE.x, y2: NODE.y, color: lt.color, key: lKey.current })
-        await w(600); if (!alive.current) break
+        await w(900); if (!alive.current) break
         setColorBeam(null)
 
-        // ── Phase 4: Grey line rewinds ────────────────────────────────────────
+        // ── Phase 4: Grey dots hide (cover grows from tool back to node) ──────
         lKey.current++
         setGreyLine({ x1: NODE.x, y1: NODE.y, x2: lt.x, y2: lt.y, phase: 'rewind', key: lKey.current })
-        await w(450); if (!alive.current) break
+        await w(400); if (!alive.current) break
         setGreyLine(null)
         setActiveIdx(null)
 
-        // ── Phase 5: Grey line draws from nodeloader → right tool ─────────────
+        // ── Phase 5: Grey dots appear node → right tool ───────────────────────
         lKey.current++
         setGreyLine({ x1: NODE.x, y1: NODE.y, x2: rt.x, y2: rt.y, phase: 'draw', key: lKey.current })
-        await w(500); if (!alive.current) break
+        await w(400); if (!alive.current) break
 
         // ── Phase 6: Colored beam travels from nodeloader → right tool ────────
         lKey.current++
         setColorBeam({ x1: NODE.x, y1: NODE.y, x2: rt.x, y2: rt.y, color: rt.color, key: lKey.current })
-        await w(600); if (!alive.current) break
+        await w(900); if (!alive.current) break
         setColorBeam(null)
 
         // ── Phase 7: Right tool activates ─────────────────────────────────────
@@ -114,10 +114,10 @@ export default function HeroBackground() {
         setPulseRing(null)
         await w(100); if (!alive.current) break
 
-        // ── Phase 8: Grey line rewinds ────────────────────────────────────────
+        // ── Phase 8: Grey dots hide (cover grows from tool back to node) ──────
         lKey.current++
         setGreyLine({ x1: NODE.x, y1: NODE.y, x2: rt.x, y2: rt.y, phase: 'rewind', key: lKey.current })
-        await w(450); if (!alive.current) break
+        await w(400); if (!alive.current) break
         setGreyLine(null)
         setActiveIdx(null)
 
@@ -214,37 +214,37 @@ export default function HeroBackground() {
           animation: hbPulseRing 700ms ease-out forwards;
         }
 
-        /* ── Grey connection line ───────────────────────────────────────── */
-        @keyframes hbGreyDraw {
-          from { stroke-dashoffset: 1; opacity: 0; }
-          10%  { opacity: 1; }
-          100% { stroke-dashoffset: 0; opacity: 1; }
+        /* ── Grey dotted line — cover peels away (draw) or grows (rewind) ─ */
+        /*    The dotted line is static; a white cover handles direction.    */
+        @keyframes hbCoverDraw {
+          from { stroke-dashoffset: 0; }
+          to   { stroke-dashoffset: -1; }
         }
-        .hb-grey-draw {
-          stroke-dasharray: 1;
-          stroke-dashoffset: 1;
-          animation: hbGreyDraw 500ms ease-out forwards;
-        }
-
-        @keyframes hbGreyRewind {
-          from { stroke-dashoffset: 0; opacity: 1; }
-          90%  { opacity: 0.6; }
-          100% { stroke-dashoffset: -1; opacity: 0; }
-        }
-        .hb-grey-rewind {
+        .hb-grey-cover-draw {
           stroke-dasharray: 1;
           stroke-dashoffset: 0;
-          animation: hbGreyRewind 450ms ease-in forwards;
+          animation: hbCoverDraw 400ms ease-out forwards;
         }
 
-        /* ── Colored traveling beam spark ───────────────────────────────── */
+        @keyframes hbCoverRewind {
+          from { stroke-dashoffset: 1; }
+          to   { stroke-dashoffset: 0; }
+        }
+        .hb-grey-cover-rewind {
+          stroke-dasharray: 1;
+          stroke-dashoffset: 1;
+          animation: hbCoverRewind 400ms ease-in forwards;
+        }
+
+        /* ── Colored traveling beam ─────────────────────────────────────── */
+        /*    dashoffset 0.2→-0.8 sends a 20%-length beam from x1 to x2.   */
         @keyframes hbBeamTravel {
-          from { stroke-dashoffset: 1.15; }
-          to   { stroke-dashoffset: -0.15; }
+          from { stroke-dashoffset: 0.2; }
+          to   { stroke-dashoffset: -0.8; }
         }
         .hb-beam-travel {
-          stroke-dasharray: 0.15 1;
-          animation: hbBeamTravel 600ms ease-in-out forwards;
+          stroke-dasharray: 0.2 0.8;
+          animation: hbBeamTravel 900ms ease-in-out forwards;
         }
       `}</style>
 
@@ -275,40 +275,58 @@ export default function HeroBackground() {
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
       >
-        {/* Grey connection line */}
+        {/* Grey dotted connection line + white directional cover ────────
+             The dots are static (full-length, always rendered at opacity 1).
+             A white cover line sits on top and is animated to peel away
+             (draw phase) or grow back (rewind phase), creating a directional
+             reveal/hide without touching the dot dasharray itself.          */}
         {greyLine && (
           <g key={`gl-${greyLine.key}`}>
+            {/* Dots — pure round dots via dash=0 + round linecap */}
             <line
-              className={greyLine.phase === 'draw' ? 'hb-grey-draw' : 'hb-grey-rewind'}
               x1={greyLine.x1} y1={greyLine.y1}
               x2={greyLine.x2} y2={greyLine.y2}
               pathLength="1"
-              stroke="rgba(180,180,195,0.65)" strokeWidth="1.5" strokeLinecap="round"
+              stroke="rgba(140,145,162,0.9)"
+              strokeWidth="2"
+              strokeDasharray="0 0.06"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            {/* White cover — peels from x1 (draw) or grows from x2 (rewind) */}
+            <line
+              className={greyLine.phase === 'draw' ? 'hb-grey-cover-draw' : 'hb-grey-cover-rewind'}
+              x1={greyLine.x1} y1={greyLine.y1}
+              x2={greyLine.x2} y2={greyLine.y2}
+              pathLength="1"
+              stroke="#FFFFFF"
+              strokeWidth="6"
+              strokeLinecap="butt"
               vectorEffect="non-scaling-stroke"
             />
           </g>
         )}
 
-        {/* Colored traveling beam (glow + core) */}
+        {/* Colored traveling beam (glow + bright core) */}
         {colorBeam && (
           <g key={`cb-${colorBeam.key}`}>
-            {/* Glow layer */}
+            {/* Wide glow */}
             <line
               className="hb-beam-travel"
               x1={colorBeam.x1} y1={colorBeam.y1}
               x2={colorBeam.x2} y2={colorBeam.y2}
               pathLength="1"
-              stroke={colorBeam.color} strokeWidth="5" strokeLinecap="round"
-              style={{ opacity: 0.3 }}
+              stroke={colorBeam.color} strokeWidth="8" strokeLinecap="round"
+              style={{ opacity: 0.25 }}
               vectorEffect="non-scaling-stroke"
             />
-            {/* Core layer */}
+            {/* Bright core */}
             <line
               className="hb-beam-travel"
               x1={colorBeam.x1} y1={colorBeam.y1}
               x2={colorBeam.x2} y2={colorBeam.y2}
               pathLength="1"
-              stroke={colorBeam.color} strokeWidth="1.5" strokeLinecap="round"
+              stroke={colorBeam.color} strokeWidth="2" strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
             />
           </g>
