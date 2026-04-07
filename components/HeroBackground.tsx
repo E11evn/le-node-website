@@ -3,22 +3,21 @@ import { useEffect, useRef, useState } from 'react'
 
 // Tool positions matched from reference 100% opacity.png
 const TOOLS = [
-  { id: 'clay',        x: 19, y: 21 },
-  { id: 'dropcontact', x: 34, y: 23 },
-  { id: 'salesforce',  x: 72, y: 27 },
-  { id: 'hubspot',     x: 86, y: 18 },
-  { id: 'google',      x: 13, y: 39 },
-  { id: 'slack',       x: 80, y: 45 },
-  { id: 'linkedin',    x: 26, y: 54 },
-  { id: 'webhook',     x: 86, y: 58 },
-  { id: 'notion',      x: 72, y: 66 },
-  { id: 'claude',      x: 18, y: 73 },
-  { id: 'apollo',      x: 34, y: 86 },
-  { id: 'pipedrive',   x: 79, y: 86 },
+  { id: 'clay',        x: 19, y: 21, logoSize: 28, color: '#D4A84B' },
+  { id: 'dropcontact', x: 34, y: 23, logoSize: 38, color: '#3B5BDB' },
+  { id: 'salesforce',  x: 72, y: 27, logoSize: 38, color: '#00A1E0' },
+  { id: 'hubspot',     x: 86, y: 18, logoSize: 38, color: '#FF7A59' },
+  { id: 'google',      x: 13, y: 39, logoSize: 38, color: '#4285F4' },
+  { id: 'slack',       x: 80, y: 45, logoSize: 38, color: '#4A154B' },
+  { id: 'linkedin',    x: 26, y: 54, logoSize: 38, color: '#0A66C2' },
+  { id: 'webhook',     x: 86, y: 58, logoSize: 38, color: '#8B5CF6' },
+  { id: 'notion',      x: 72, y: 66, logoSize: 38, color: '#2F2F2F' },
+  { id: 'claude',      x: 18, y: 73, logoSize: 38, color: '#CC785C' },
+  { id: 'apollo',      x: 34, y: 86, logoSize: 38, color: '#7C3AED' },
+  { id: 'pipedrive',   x: 79, y: 86, logoSize: 38, color: '#27AE60' },
 ]
 
-const ICON_S = 38
-const BOX_S  = 52
+const BOX_S = 52
 
 // Grid positions from reference grid.svg
 const H_LINES = [16.67, 33.33, 50.00, 66.67, 83.33]
@@ -32,23 +31,30 @@ const LEFT_INDICES  = TOOLS.map((_, i) => i).filter(i => TOOLS[i].x < 50)
 // Right tools (x >= 50): salesforce, hubspot, slack, webhook, notion, pipedrive
 const RIGHT_INDICES = TOOLS.map((_, i) => i).filter(i => TOOLS[i].x >= 50)
 
-// Approximate CTA ("Join waitlist") position within the hero background
-// Hero is flex-centered; h1 (2 lines) + 40px gap puts the CTA button at ~52% down
-const CTA = { x: 50, y: 52 }
+// NodeLoader center position
+const NODE = { x: 50, y: 50 }
 
-type Beam = { x1: number; y1: number; x2: number; y2: number; key: number }
+type GreyLine = {
+  x1: number; y1: number; x2: number; y2: number;
+  phase: 'draw' | 'rewind';
+  key: number;
+}
+
+type ColorBeam = {
+  x1: number; y1: number; x2: number; y2: number;
+  color: string;
+  key: number;
+}
 
 export default function HeroBackground() {
   const [activeIdx,  setActiveIdx]  = useState<number | null>(null)
   const [pulseRing,  setPulseRing]  = useState<{ idx: number; key: number } | null>(null)
-  const [beamOut,    setBeamOut]    = useState<Beam | null>(null)
-  const [beamIn,     setBeamIn]     = useState<Beam | null>(null)
-  // Non-zero = active; value used as React key so each trigger re-mounts the glow element
-  const [ctaGlowKey, setCtaGlowKey] = useState(0)
+  const [greyLine,   setGreyLine]   = useState<GreyLine | null>(null)
+  const [colorBeam,  setColorBeam]  = useState<ColorBeam | null>(null)
 
   const leftCursor  = useRef(0)
   const rightCursor = useRef(0)
-  const bKey        = useRef(0)
+  const lKey        = useRef(0)
   const pKey        = useRef(0)
   const alive       = useRef(true)
 
@@ -63,42 +69,60 @@ export default function HeroBackground() {
         const lt = TOOLS[li]
         const rt = TOOLS[ri]
 
-        // ── Phase 1: Left tool activates (pulse + opacity → 1) ────────────
+        // ── Phase 1: Left tool activates ─────────────────────────────────────
         setActiveIdx(li)
         pKey.current++
         setPulseRing({ idx: li, key: pKey.current })
-        await w(700);  if (!alive.current) break   // pulse ring duration
+        await w(700); if (!alive.current) break
         setPulseRing(null)
-        await w(200);  if (!alive.current) break   // brief hold at full opacity
+        await w(100); if (!alive.current) break
 
-        // ── Phase 2: Beam travels from left tool → CTA ────────────────────
-        bKey.current++
-        setBeamOut({ x1: lt.x, y1: lt.y, x2: CTA.x, y2: CTA.y, key: bKey.current })
-        await w(550);  if (!alive.current) break   // beam travel time
+        // ── Phase 2: Grey line draws from nodeloader → left tool ──────────────
+        lKey.current++
+        setGreyLine({ x1: NODE.x, y1: NODE.y, x2: lt.x, y2: lt.y, phase: 'draw', key: lKey.current })
+        await w(500); if (!alive.current) break
 
-        // ── Phase 3: Beam reaches CTA — left fades, CTA glows ─────────────
-        setBeamOut(null)
+        // ── Phase 3: Colored beam travels from left tool → nodeloader ─────────
+        lKey.current++
+        setColorBeam({ x1: lt.x, y1: lt.y, x2: NODE.x, y2: NODE.y, color: lt.color, key: lKey.current })
+        await w(600); if (!alive.current) break
+        setColorBeam(null)
+
+        // ── Phase 4: Grey line rewinds ────────────────────────────────────────
+        lKey.current++
+        setGreyLine({ x1: NODE.x, y1: NODE.y, x2: lt.x, y2: lt.y, phase: 'rewind', key: lKey.current })
+        await w(450); if (!alive.current) break
+        setGreyLine(null)
         setActiveIdx(null)
-        setCtaGlowKey(k => k + 1)
-        await w(200);  if (!alive.current) break   // brief pause before emitting
 
-        // ── Phase 4: CTA emits beam → right tool ──────────────────────────
-        bKey.current++
-        setBeamIn({ x1: CTA.x, y1: CTA.y, x2: rt.x, y2: rt.y, key: bKey.current })
-        await w(550);  if (!alive.current) break   // beam travel time
+        // ── Phase 5: Grey line draws from nodeloader → right tool ─────────────
+        lKey.current++
+        setGreyLine({ x1: NODE.x, y1: NODE.y, x2: rt.x, y2: rt.y, phase: 'draw', key: lKey.current })
+        await w(500); if (!alive.current) break
 
-        // ── Phase 5: Right tool activates ─────────────────────────────────
-        setBeamIn(null)
+        // ── Phase 6: Colored beam travels from nodeloader → right tool ────────
+        lKey.current++
+        setColorBeam({ x1: NODE.x, y1: NODE.y, x2: rt.x, y2: rt.y, color: rt.color, key: lKey.current })
+        await w(600); if (!alive.current) break
+        setColorBeam(null)
+
+        // ── Phase 7: Right tool activates ─────────────────────────────────────
         setActiveIdx(ri)
         pKey.current++
         setPulseRing({ idx: ri, key: pKey.current })
-        await w(700);  if (!alive.current) break   // pulse ring duration
+        await w(700); if (!alive.current) break
         setPulseRing(null)
-        await w(200);  if (!alive.current) break   // brief hold at full opacity
+        await w(100); if (!alive.current) break
 
-        // ── Phase 6: Right tool fades + inter-cycle pause ─────────────────
+        // ── Phase 8: Grey line rewinds ────────────────────────────────────────
+        lKey.current++
+        setGreyLine({ x1: NODE.x, y1: NODE.y, x2: rt.x, y2: rt.y, phase: 'rewind', key: lKey.current })
+        await w(450); if (!alive.current) break
+        setGreyLine(null)
         setActiveIdx(null)
-        await w(1300); if (!alive.current) break
+
+        // ── Inter-cycle pause ─────────────────────────────────────────────────
+        await w(800); if (!alive.current) break
       }
     }
 
@@ -145,9 +169,7 @@ export default function HeroBackground() {
           100% { opacity: 0; }
         }
 
-        /* ── Icon appear + float ────────────────────────────────────────────
-           hbIconAppear ends at opacity:1 so the outer opacity wrapper
-           (set to 0.6 at rest, 1.0 when active) controls visible brightness.  */
+        /* ── Icon appear + float ──────────────────────────────────────────── */
         @keyframes hbIconAppear {
           from { opacity: 0; scale: 0.6; }
           to   { opacity: 1; scale: 1;   }
@@ -192,33 +214,37 @@ export default function HeroBackground() {
           animation: hbPulseRing 700ms ease-out forwards;
         }
 
-        /* ── CTA glow (appears when a beam arrives / departs) ───────────── */
-        @keyframes hbCtaGlow {
-          0%   { opacity: 0; transform: translate(-50%, -50%) scaleX(0.5); }
-          35%  { opacity: 1; }
-          100% { opacity: 0; transform: translate(-50%, -50%) scaleX(1.3); }
-        }
-        .hb-cta-glow {
-          position: absolute;
-          width: 260px; height: 60px; border-radius: 30px;
-          background: radial-gradient(ellipse at center, rgba(0, 0, 250, 0.18) 0%, transparent 70%);
-          pointer-events: none;
-          animation: hbCtaGlow 700ms ease-out forwards;
-        }
-
-        /* ── SVG beam (two-layer: glow + core) ──────────────────────────── */
-        @keyframes hbBeamDraw {
+        /* ── Grey connection line ───────────────────────────────────────── */
+        @keyframes hbGreyDraw {
           from { stroke-dashoffset: 1; opacity: 0; }
           10%  { opacity: 1; }
-          100% { stroke-dashoffset: 0;   opacity: 1; }
+          100% { stroke-dashoffset: 0; opacity: 1; }
         }
-        .hb-beam-glow {
-          stroke-dasharray: 1; stroke-dashoffset: 1;
-          animation: hbBeamDraw 550ms ease-out forwards;
+        .hb-grey-draw {
+          stroke-dasharray: 1;
+          stroke-dashoffset: 1;
+          animation: hbGreyDraw 500ms ease-out forwards;
         }
-        .hb-beam-core {
-          stroke-dasharray: 1; stroke-dashoffset: 1;
-          animation: hbBeamDraw 550ms ease-out forwards;
+
+        @keyframes hbGreyRewind {
+          from { stroke-dashoffset: 0; opacity: 1; }
+          90%  { opacity: 0.6; }
+          100% { stroke-dashoffset: -1; opacity: 0; }
+        }
+        .hb-grey-rewind {
+          stroke-dasharray: 1;
+          stroke-dashoffset: 0;
+          animation: hbGreyRewind 450ms ease-in forwards;
+        }
+
+        /* ── Colored traveling beam spark ───────────────────────────────── */
+        @keyframes hbBeamTravel {
+          from { stroke-dashoffset: 1.15; }
+          to   { stroke-dashoffset: -0.15; }
+        }
+        .hb-beam-travel {
+          stroke-dasharray: 0.15 1;
+          animation: hbBeamTravel 600ms ease-in-out forwards;
         }
       `}</style>
 
@@ -240,58 +266,49 @@ export default function HeroBackground() {
         ))}
       </div>
 
-      {/* ── CTA glow — re-mounts on each trigger via key ────────────────── */}
-      {ctaGlowKey > 0 && (
-        <div
-          key={ctaGlowKey}
-          className="hb-cta-glow"
-          style={{ left: `${CTA.x}%`, top: `${CTA.y}%` }}
-        />
-      )}
-
-      {/* ── SVG beam overlay ─────────────────────────────────────────────
-           viewBox 0 0 100 100 + preserveAspectRatio="none" maps tool/CTA
-           percentage positions directly to SVG coordinates.
+      {/* ── SVG overlay: grey connection line + colored beam ─────────────
+           viewBox 0 0 100 100 + preserveAspectRatio="none" maps percentage
+           positions directly to SVG coordinates.
            vector-effect="non-scaling-stroke" keeps stroke width in CSS px. */}
       <svg
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', overflow: 'visible' }}
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
       >
-        {beamOut && (
-          <g key={`bo-${beamOut.key}`}>
-            {/* soft glow layer */}
+        {/* Grey connection line */}
+        {greyLine && (
+          <g key={`gl-${greyLine.key}`}>
             <line
-              className="hb-beam-glow"
-              x1={beamOut.x1} y1={beamOut.y1} x2={beamOut.x2} y2={beamOut.y2}
+              className={greyLine.phase === 'draw' ? 'hb-grey-draw' : 'hb-grey-rewind'}
+              x1={greyLine.x1} y1={greyLine.y1}
+              x2={greyLine.x2} y2={greyLine.y2}
               pathLength="1"
-              stroke="rgba(0,0,250,0.18)" strokeWidth="5" strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-            />
-            {/* bright core */}
-            <line
-              className="hb-beam-core"
-              x1={beamOut.x1} y1={beamOut.y1} x2={beamOut.x2} y2={beamOut.y2}
-              pathLength="1"
-              stroke="rgba(0,0,250,0.65)" strokeWidth="1" strokeLinecap="round"
+              stroke="rgba(180,180,195,0.65)" strokeWidth="1.5" strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
             />
           </g>
         )}
-        {beamIn && (
-          <g key={`bi-${beamIn.key}`}>
+
+        {/* Colored traveling beam (glow + core) */}
+        {colorBeam && (
+          <g key={`cb-${colorBeam.key}`}>
+            {/* Glow layer */}
             <line
-              className="hb-beam-glow"
-              x1={beamIn.x1} y1={beamIn.y1} x2={beamIn.x2} y2={beamIn.y2}
+              className="hb-beam-travel"
+              x1={colorBeam.x1} y1={colorBeam.y1}
+              x2={colorBeam.x2} y2={colorBeam.y2}
               pathLength="1"
-              stroke="rgba(0,0,250,0.18)" strokeWidth="5" strokeLinecap="round"
+              stroke={colorBeam.color} strokeWidth="5" strokeLinecap="round"
+              style={{ opacity: 0.3 }}
               vectorEffect="non-scaling-stroke"
             />
+            {/* Core layer */}
             <line
-              className="hb-beam-core"
-              x1={beamIn.x1} y1={beamIn.y1} x2={beamIn.x2} y2={beamIn.y2}
+              className="hb-beam-travel"
+              x1={colorBeam.x1} y1={colorBeam.y1}
+              x2={colorBeam.x2} y2={colorBeam.y2}
               pathLength="1"
-              stroke="rgba(0,0,250,0.65)" strokeWidth="1" strokeLinecap="round"
+              stroke={colorBeam.color} strokeWidth="1.5" strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
             />
           </g>
@@ -348,8 +365,8 @@ export default function HeroBackground() {
                 <img
                   src={`/logos/${tool.id}.png`}
                   alt=""
-                  width={ICON_S}
-                  height={ICON_S}
+                  width={tool.logoSize}
+                  height={tool.logoSize}
                   draggable={false}
                   style={{ display: 'block', borderRadius: 6 }}
                 />
