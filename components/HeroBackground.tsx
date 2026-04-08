@@ -126,17 +126,14 @@ export default function HeroBackground({ onSetComputing }: Props) {
         if (!alive.current) break
         bv.style.display = 'none'
 
+        // ── Computing pulse starts the moment beam arrives ────────────────
+        onSetComputing(true)
+
         // ── Step 5: Grey path deconstructs tool → nodeloader ─────────────
         await animateDash(gm, 0, -1, 800)
         if (!alive.current) break
         gv.style.display = 'none'
         setActiveIdx(null)
-
-        // ── Step 5b: NodeLoader computing pulse ───────────────────────────
-        onSetComputing(true)
-        await w(1400); if (!alive.current) break
-        onSetComputing(false)
-        await w(200); if (!alive.current) break
 
         // ── Step 6: Grey path builds nodeloader → right tool ─────────────
         setCoords(gm, NODE.x, NODE.y, rt.x, rt.y)
@@ -145,6 +142,10 @@ export default function HeroBackground({ onSetComputing }: Props) {
         gv.style.display = ''
         await animateDash(gm, 1, 0, 1200)
         if (!alive.current) break
+
+        // ── Computing ends just before beam departs ───────────────────────
+        onSetComputing(false)
+        await w(120); if (!alive.current) break
 
         // ── Step 7: Grey path stays visible ──────────────────────────────
 

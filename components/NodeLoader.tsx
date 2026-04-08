@@ -10,7 +10,7 @@ export default function NodeLoader({ computing }: { computing?: boolean }) {
         @keyframes nlPulse3 { 0%,100% { transform: scale(1);    } 50% { transform: scale(0.78); } }
         @keyframes nlCorePulse {
           0%,100% { transform: scale(1);   box-shadow: 0 0 5px rgba(0,67,250,0.5); }
-          50%     { transform: scale(2.4); box-shadow: 0 0 16px rgba(0,67,250,1);  }
+          50%     { transform: scale(1.2); box-shadow: 0 0 16px rgba(0,67,250,1);  }
         }
       `}</style>
 
@@ -24,7 +24,7 @@ export default function NodeLoader({ computing }: { computing?: boolean }) {
       />
 
       {/* Outer Dashed Ring */}
-      <div style={{ position: 'absolute', inset: 0, transformOrigin: '50% 50%', animation: computing ? 'nlPulse0 0.70s ease-in-out infinite' : 'none' }}>
+      <div style={{ position: 'absolute', inset: 0, transformOrigin: '50% 50%', animation: computing ? 'nlPulse0 800ms ease-in-out 0ms 1' : 'none' }}>
         <div
           className="absolute inset-0 rounded-full border border-dashed animate-[spin_10s_linear_infinite]"
           style={{ borderColor: 'rgba(0,67,250,0.25)' }}
@@ -32,7 +32,7 @@ export default function NodeLoader({ computing }: { computing?: boolean }) {
       </div>
 
       {/* Main Arc */}
-      <div style={{ position: 'absolute', inset: 0, transformOrigin: '50% 50%', animation: computing ? 'nlPulse1 0.50s ease-in-out infinite' : 'none' }}>
+      <div style={{ position: 'absolute', inset: 0, transformOrigin: '50% 50%', animation: computing ? 'nlPulse1 700ms ease-in-out 80ms 1' : 'none' }}>
         <div
           className="absolute rounded-full border-[2px] border-transparent animate-[spin_2s_linear_infinite]"
           style={{
@@ -44,7 +44,7 @@ export default function NodeLoader({ computing }: { computing?: boolean }) {
       </div>
 
       {/* Reverse Arc */}
-      <div style={{ position: 'absolute', inset: 0, transformOrigin: '50% 50%', animation: computing ? 'nlPulse2 0.45s ease-in-out infinite' : 'none' }}>
+      <div style={{ position: 'absolute', inset: 0, transformOrigin: '50% 50%', animation: computing ? 'nlPulse2 900ms ease-in-out 160ms 1' : 'none' }}>
         <div
           className="absolute rounded-full border-[2px] border-transparent animate-[spin_3s_linear_infinite_reverse]"
           style={{
@@ -56,7 +56,7 @@ export default function NodeLoader({ computing }: { computing?: boolean }) {
       </div>
 
       {/* Inner Fast Ring */}
-      <div style={{ position: 'absolute', inset: 0, transformOrigin: '50% 50%', animation: computing ? 'nlPulse3 0.38s ease-in-out infinite' : 'none' }}>
+      <div style={{ position: 'absolute', inset: 0, transformOrigin: '50% 50%', animation: computing ? 'nlPulse3 650ms ease-in-out 240ms 1' : 'none' }}>
         <div
           className="absolute rounded-full border border-transparent animate-[spin_1s_ease-in-out_infinite]"
           style={{
@@ -83,7 +83,7 @@ export default function NodeLoader({ computing }: { computing?: boolean }) {
         style={{
           background: '#1D1D22',
           ...(computing
-            ? { animation: 'nlCorePulse 0.55s ease-in-out infinite' }
+            ? { animation: 'nlCorePulse 850ms ease-in-out 50ms 1' }
             : { boxShadow: '0 0 5px rgba(0,67,250,0.5)' }),
         }}
       />
