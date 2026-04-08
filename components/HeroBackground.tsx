@@ -270,7 +270,7 @@ export default function HeroBackground() {
                     attributeName="stroke-dashoffset"
                     begin="indefinite"
                     from={greyLine.phase === 'draw' ? '1' : '0'}
-                    to={greyLine.phase === 'draw' ? '0' : '1'}
+                    to={greyLine.phase === 'draw' ? '0' : '-1'}
                     dur={greyLine.phase === 'draw' ? '0.6s' : '0.4s'}
                     fill="freeze"
                   />
