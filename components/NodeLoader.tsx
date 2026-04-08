@@ -2,7 +2,7 @@
 
 export default function NodeLoader() {
   return (
-    <div className="relative w-[90px] h-[90px] flex items-center justify-center">
+    <div className="relative w-[80px] h-[80px] flex items-center justify-center">
 
       {/* Base Glow */}
       <div
@@ -33,7 +33,7 @@ export default function NodeLoader() {
       <div
         className="absolute rounded-full border-[2px] border-transparent animate-[spin_3s_linear_infinite_reverse]"
         style={{
-          inset: '10px',
+          inset: '9px',
           borderBottomColor: 'rgba(29,29,34,0.5)',
           boxShadow: '0 0 5px rgba(29,29,34,0.15)',
         }}
@@ -43,7 +43,7 @@ export default function NodeLoader() {
       <div
         className="absolute rounded-full border border-transparent animate-[spin_1s_ease-in-out_infinite]"
         style={{
-          inset: '17px',
+          inset: '15px',
           borderLeftColor: 'rgba(0,67,250,0.55)',
         }}
       />

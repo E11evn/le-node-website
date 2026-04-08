@@ -27,9 +27,9 @@ Marketing website for le-node, a GTM automation platform with two offerings: an 
 ## Components
 | Component | File | What it does |
 |-----------|------|-------------|
-| Hero | components/Hero.tsx | /os hero (80vh max): tag badge → h1 → NodeLoader spacer (120px) → description → CTA; NodeLoader absolutely centered |
+| Hero | components/Hero.tsx | /os hero (80vh max): tag badge → h1 → NodeLoader spacer (100px) → description → CTA; NodeLoader absolutely centered, equal gap from h1 and tagline |
 | HeroBackground | components/HeroBackground.tsx | Animated background: grid lines, 12 floating tool icons, grey connection paths (stroke-dashoffset progressive draw) + colored beam pulses (same-width overlay traveling inside path) cycling between tools and NodeLoader |
-| NodeLoader | components/NodeLoader.tsx | 90px spinning-rings loader in brand palette (blue #0043FA / dark #1D1D22); no text |
+| NodeLoader | components/NodeLoader.tsx | 80px spinning-rings loader in brand palette (blue #0043FA / dark #1D1D22); no text |
 | Nav | components/Nav.tsx | Sticky nav; context-aware CTA (waitlist vs book-a-call) via usePathname |
 | Footer | components/Footer.tsx | Links to all pages + copyright |
 | SplitScreen | components/SplitScreen.tsx | Home page two-panel layout with hover overlays and scale effect |
@@ -61,7 +61,7 @@ Marketing website for le-node, a GTM automation platform with two offerings: an 
 - Brand colors: blue `#0043FA` (OS/product), orange `#FA7900` (agence), dark `#1D1D22` (text/UI)
 - Percentage-based positioning for HeroBackground tool icons (x/y in 0–100 space matching a 100×100 SVG viewBox)
 - SVG animations always use `pathLength="1"` + `stroke-dasharray/dashoffset` — never bare pixel dash values (they complete in <10% of duration)
-- Grey path + beam use two-layer architecture: visual dotted `<line>` (`vectorEffect="non-scaling-stroke"`, `strokeDasharray="0 9"`, `strokeLinecap="round"`, 2.5px) for consistent px dot spacing + `<mask>` with thick SMIL-animated line (`pathLength="1"`) controlling which portion is visible
+- Grey path + beam use two-layer architecture: visual dotted `<line>` (`vectorEffect="non-scaling-stroke"`, `strokeDasharray="0 9"`, `strokeLinecap="round"`, 2.5px) for consistent px dot spacing + `<mask>` with thick SMIL-animated line (`pathLength="1"`) controlling which portion is visible. SMIL `<animate>` MUST use `begin="indefinite"` + ref callback `el.beginElement()` — default `begin="0s"` fires relative to document timeline, not element insertion, causing instant reveal
 - Grey connection path: dotted line revealed progressively via mask dashoffset `1→0` (0.6s); retracts via dashoffset `0→1` (0.4s)
 - Traveling beam: same dot pattern as grey, colored with tool color, masked by a short 18%-length window (`dasharray="0.18 0.82"`, `dashoffset 0.18→-1`, 0.7s) that sweeps start to end
 - `'use client'` required on any component using useState/useEffect/usePathname
@@ -78,4 +78,5 @@ Marketing website for le-node, a GTM automation platform with two offerings: an 
 - Hero redesign (/os): added "AI-native operating system" pill tag above h1; moved CTA below description paragraph; replaced CTA beam target with NodeLoader (spinning ring, blue/dark palette); animation rearchitected to 8-phase cycle (left tool activates → grey line draws node→tool → colored spark travels tool→node → line rewinds → grey line draws node→right tool → colored spark travels node→tool → right tool activates → line rewinds); Clay logo reduced from 38px to 28px; hero min-height increased to 100vh
 - NodeLoader refined: scaled to 120px; hero spacer reduced to 180px
 - HeroBackground animation fully rewritten with mask-based approach: visual dotted lines (`strokeDasharray="0 9"`, round caps, 2.5px, `vectorEffect`) masked by thick SMIL-animated lines (`pathLength="1"`) for progressive reveal/travel; beam uses same dot pattern as grey, colored per-tool, masked by a short traveling window; both layers separated so px-based spacing and pathLength-based animation don't conflict
-- Hero reduced to 80vh max; NodeLoader scaled from 120px to 90px; spacer reduced from 180px to 120px
+- Critical SMIL fix: `<animate>` elements must use `begin="indefinite"` + `el.beginElement()` ref callback — default `begin="0s"` fires relative to document load timeline, not DOM insertion, so dynamically added elements showed the animation's end state instantly
+- Hero reduced to 80vh max; NodeLoader scaled to 80px; spacer 100px; h1 mb-4 for equal NodeLoader gap

@@ -25,14 +25,14 @@ export default function Hero() {
           <span style={{ color: '#0043FA', fontSize: '1rem', fontWeight: 500 }}>AI-native operating system</span>
         </div>
 
-        <h1 className="text-display font-bold text-[#1D1D22] mb-6">
+        <h1 className="text-display font-bold text-[#1D1D22] mb-4">
           Your entire GTM motion.
           <br />
           <span style={{ color: '#0043FA' }}>On autopilot.</span>
         </h1>
 
-        {/* Spacer — reserves vertical room for the NodeLoader */}
-        <div style={{ height: '120px' }} />
+        {/* Spacer — reserves vertical room for the NodeLoader (80px + equal margins) */}
+        <div style={{ height: '100px' }} />
 
         <p className="text-lg text-gray-500 max-w-lg mx-auto leading-relaxed mb-10">
           le-node handles the research, outreach, and enrichment — so your team

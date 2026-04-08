@@ -250,7 +250,9 @@ export default function HeroBackground() {
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
       >
-        {/* Grey dotted path — revealed progressively via animated mask */}
+        {/* Grey dotted path — revealed progressively via animated mask.
+             begin="indefinite" prevents SMIL starting on document timeline;
+             ref callback calls beginElement() on actual DOM mount. */}
         {greyLine && (
           <g key={`gl-${greyLine.key}`}>
             <defs>
@@ -265,7 +267,9 @@ export default function HeroBackground() {
                   strokeDashoffset={greyLine.phase === 'draw' ? 1 : 0}
                 >
                   <animate
+                    ref={(el: SVGAnimateElement | null) => { if (el) el.beginElement() }}
                     attributeName="stroke-dashoffset"
+                    begin="indefinite"
                     from={greyLine.phase === 'draw' ? '1' : '0'}
                     to={greyLine.phase === 'draw' ? '0' : '1'}
                     dur={greyLine.phase === 'draw' ? '0.6s' : '0.4s'}
@@ -302,7 +306,9 @@ export default function HeroBackground() {
                   strokeDashoffset="0.18"
                 >
                   <animate
+                    ref={(el: SVGAnimateElement | null) => { if (el) el.beginElement() }}
                     attributeName="stroke-dashoffset"
+                    begin="indefinite"
                     from="0.18"
                     to="-1"
                     dur="0.7s"
