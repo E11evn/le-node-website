@@ -34,27 +34,18 @@ const RIGHT_INDICES = TOOLS.map((_, i) => i).filter(i => TOOLS[i].x >= 50)
 // NodeLoader center position
 const NODE = { x: 50, y: 50 }
 
-type GreyLine = {
-  x1: number; y1: number; x2: number; y2: number;
-  phase: 'draw' | 'rewind';
-  key: number;
-}
-
-type ColorBeam = {
-  x1: number; y1: number; x2: number; y2: number;
-  color: string;
-  key: number;
-}
-
 export default function HeroBackground() {
-  const [activeIdx,  setActiveIdx]  = useState<number | null>(null)
-  const [pulseRing,  setPulseRing]  = useState<{ idx: number; key: number } | null>(null)
-  const [greyLine,   setGreyLine]   = useState<GreyLine | null>(null)
-  const [colorBeam,  setColorBeam]  = useState<ColorBeam | null>(null)
+  const [activeIdx, setActiveIdx] = useState<number | null>(null)
+  const [pulseRing, setPulseRing] = useState<{ idx: number; key: number } | null>(null)
+
+  // Refs for imperative SVG animation — no SMIL, no React key remounting
+  const greyMaskRef = useRef<SVGLineElement>(null)
+  const greyVisRef  = useRef<SVGLineElement>(null)
+  const beamMaskRef = useRef<SVGLineElement>(null)
+  const beamVisRef  = useRef<SVGLineElement>(null)
 
   const leftCursor  = useRef(0)
   const rightCursor = useRef(0)
-  const lKey        = useRef(0)
   const pKey        = useRef(0)
   const alive       = useRef(true)
 
@@ -62,14 +53,46 @@ export default function HeroBackground() {
     alive.current = true
     const w = (ms: number) => new Promise<void>(r => setTimeout(r, ms))
 
+    // Animate stroke-dashoffset from `from` to `to` over `dur` ms (ease-out cubic)
+    function animateDash(el: SVGLineElement, from: number, to: number, dur: number): Promise<void> {
+      return new Promise(resolve => {
+        const start = performance.now()
+        function tick(now: number) {
+          if (!alive.current) { resolve(); return }
+          const t = Math.min((now - start) / dur, 1)
+          const ease = 1 - Math.pow(1 - t, 3) // ease-out cubic
+          el.setAttribute('stroke-dashoffset', String(from + (to - from) * ease))
+          if (t < 1) requestAnimationFrame(tick)
+          else resolve()
+        }
+        requestAnimationFrame(tick)
+      })
+    }
+
+    function setCoords(el: SVGLineElement, x1: number, y1: number, x2: number, y2: number) {
+      el.setAttribute('x1', String(x1))
+      el.setAttribute('y1', String(y1))
+      el.setAttribute('x2', String(x2))
+      el.setAttribute('y2', String(y2))
+    }
+
     async function loop() {
+      const gm = greyMaskRef.current!
+      const gv = greyVisRef.current!
+      const bm = beamMaskRef.current!
+      const bv = beamVisRef.current!
+
+      // Hide both visual lines initially
+      gv.style.display = 'none'
+      bv.style.display = 'none'
+
       while (alive.current) {
         const li = LEFT_INDICES[leftCursor.current++ % LEFT_INDICES.length]
         const ri = RIGHT_INDICES[rightCursor.current++ % RIGHT_INDICES.length]
         const lt = TOOLS[li]
         const rt = TOOLS[ri]
 
-        // ── Phase 1: Left tool activates ─────────────────────────────────────
+        // ── Step 1: Left tool activates ──────────────────────────────────
         setActiveIdx(li)
         pKey.current++
         setPulseRing({ idx: li, key: pKey.current })
@@ -77,35 +100,54 @@ export default function HeroBackground() {
         setPulseRing(null)
         await w(100); if (!alive.current) break
 
-        // ── Phase 2: Grey path builds node → left tool ───────────────────────
-        lKey.current++
-        setGreyLine({ x1: NODE.x, y1: NODE.y, x2: lt.x, y2: lt.y, phase: 'draw', key: lKey.current })
-        await w(600); if (!alive.current) break
+        // ── Step 2: Grey path builds nodeloader → left tool ──────────────
+        setCoords(gm, NODE.x, NODE.y, lt.x, lt.y)
+        setCoords(gv, NODE.x, NODE.y, lt.x, lt.y)
+        gm.setAttribute('stroke-dashoffset', '1')
+        gv.style.display = ''
+        await animateDash(gm, 1, 0, 600)
+        if (!alive.current) break
 
-        // ── Phase 3: Colored beam travels from left tool → nodeloader ────────
-        lKey.current++
-        setColorBeam({ x1: lt.x, y1: lt.y, x2: NODE.x, y2: NODE.y, color: lt.color, key: lKey.current })
-        await w(700); if (!alive.current) break
-        setColorBeam(null)
+        // ── Step 3: Grey path stays visible ──────────────────────────────
+        // (no action — mask offset is 0, fully revealed)
 
-        // ── Phase 4: Grey path rewinds (erases) — same key, just flip phase
-        setGreyLine(prev => prev ? { ...prev, phase: 'rewind' as const } : null)
-        await w(400); if (!alive.current) break
-        setGreyLine(null)
+        // ── Step 4: Beam travels left tool → nodeloader ──────────────────
+        setCoords(bm, lt.x, lt.y, NODE.x, NODE.y)
+        setCoords(bv, lt.x, lt.y, NODE.x, NODE.y)
+        bv.setAttribute('stroke', lt.color)
+        bm.setAttribute('stroke-dashoffset', '0.18')
+        bv.style.display = ''
+        await animateDash(bm, 0.18, -1, 700)
+        if (!alive.current) break
+        bv.style.display = 'none'
+
+        // ── Step 5: Grey path deconstructs tool → nodeloader ─────────────
+        await animateDash(gm, 0, -1, 400)
+        if (!alive.current) break
+        gv.style.display = 'none'
         setActiveIdx(null)
 
-        // ── Phase 5: Grey path builds node → right tool ─────────────────────
-        lKey.current++
-        setGreyLine({ x1: NODE.x, y1: NODE.y, x2: rt.x, y2: rt.y, phase: 'draw', key: lKey.current })
-        await w(600); if (!alive.current) break
+        // ── Step 6: Grey path builds nodeloader → right tool ─────────────
+        setCoords(gm, NODE.x, NODE.y, rt.x, rt.y)
+        setCoords(gv, NODE.x, NODE.y, rt.x, rt.y)
+        gm.setAttribute('stroke-dashoffset', '1')
+        gv.style.display = ''
+        await animateDash(gm, 1, 0, 600)
+        if (!alive.current) break
 
-        // ── Phase 6: Colored beam travels from nodeloader → right tool ──────
-        lKey.current++
-        setColorBeam({ x1: NODE.x, y1: NODE.y, x2: rt.x, y2: rt.y, color: rt.color, key: lKey.current })
-        await w(700); if (!alive.current) break
-        setColorBeam(null)
+        // ── Step 7: Grey path stays visible ──────────────────────────────
 
-        // ── Phase 7: Right tool activates ────────────────────────────────────
+        // ── Step 8: Beam travels nodeloader → right tool ─────────────────
+        setCoords(bm, NODE.x, NODE.y, rt.x, rt.y)
+        setCoords(bv, NODE.x, NODE.y, rt.x, rt.y)
+        bv.setAttribute('stroke', rt.color)
+        bm.setAttribute('stroke-dashoffset', '0.18')
+        bv.style.display = ''
+        await animateDash(bm, 0.18, -1, 700)
+        if (!alive.current) break
+        bv.style.display = 'none'
+
+        // ── Step 9: Right tool activates ─────────────────────────────────
         setActiveIdx(ri)
         pKey.current++
         setPulseRing({ idx: ri, key: pKey.current })
@@ -113,18 +155,17 @@ export default function HeroBackground() {
         setPulseRing(null)
         await w(100); if (!alive.current) break
 
-        // ── Phase 8: Grey path rewinds (erases) — same key, just flip phase
-        setGreyLine(prev => prev ? { ...prev, phase: 'rewind' as const } : null)
-        await w(400); if (!alive.current) break
-        setGreyLine(null)
+        // ── Step 10: Grey path deconstructs tool → nodeloader ────────────
+        await animateDash(gm, 0, -1, 400)
+        if (!alive.current) break
+        gv.style.display = 'none'
         setActiveIdx(null)
 
-        // ── Inter-cycle pause ────────────────────────────────────────────────
+        // ── Inter-cycle pause ────────────────────────────────────────────
         await w(800); if (!alive.current) break
       }
     }
 
-    // Start after initial appear animations settle
     const t = setTimeout(() => { if (alive.current) loop() }, 2000)
     return () => { alive.current = false; clearTimeout(t) }
   }, [])
@@ -211,9 +252,6 @@ export default function HeroBackground() {
           pointer-events: none;
           animation: hbPulseRing 700ms ease-out forwards;
         }
-
-        /* (Grey path + beam animations use SVG <animate> elements,
-            not CSS keyframes — ensures pathLength mapping is correct) */
       `}</style>
 
       {/* ── Grid lines ─────────────────────────────────────────────────── */}
@@ -234,103 +272,69 @@ export default function HeroBackground() {
         ))}
       </div>
 
-      {/* ── SVG overlay: grey dotted path + colored dotted beam ──────────
-           Architecture: two layers per animation element —
-           1. A <mask> with a thick line using pathLength="1" + SMIL <animate>
-              on stroke-dashoffset to control WHICH portion is visible
-           2. A visual dotted <line> with vectorEffect="non-scaling-stroke"
-              for consistent px-based dot spacing, clipped by the mask
+      {/* ── SVG overlay: grey dotted path + colored beam ─────────────────
+           Two persistent line pairs (mask + visual), animated imperatively
+           via requestAnimationFrame. No SMIL, no React key remounting.
 
-           viewBox 0 0 100 100 + preserveAspectRatio="none" maps percentage
-           positions directly to SVG coordinates. */}
+           Mask lines use pathLength="1" for normalized dash math.
+           Visual lines use vectorEffect="non-scaling-stroke" for px dots.
+           These are on separate elements to avoid the conflict under
+           preserveAspectRatio="none". */}
       <svg
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', overflow: 'visible' }}
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
       >
-        {/* Grey dotted path — revealed progressively via animated mask.
-             begin="indefinite" prevents SMIL starting on document timeline;
-             ref callback calls beginElement() on actual DOM mount. */}
-        {greyLine && (
-          <g key={`gl-${greyLine.key}`}>
-            <defs>
-              <mask id={`gm-${greyLine.key}`}>
-                <line
-                  x1={greyLine.x1} y1={greyLine.y1}
-                  x2={greyLine.x2} y2={greyLine.y2}
-                  pathLength={1}
-                  stroke="white"
-                  strokeWidth="200"
-                  strokeDasharray="1"
-                  strokeDashoffset={greyLine.phase === 'draw' ? 1 : 0}
-                >
-                  <animate
-                    key={`${greyLine.key}-${greyLine.phase}`}
-                    ref={(el: SVGAnimateElement | null) => { if (el) el.beginElement() }}
-                    attributeName="stroke-dashoffset"
-                    begin="indefinite"
-                    from={greyLine.phase === 'draw' ? '1' : '0'}
-                    to={greyLine.phase === 'draw' ? '0' : '-1'}
-                    dur={greyLine.phase === 'draw' ? '0.6s' : '0.4s'}
-                    fill="freeze"
-                  />
-                </line>
-              </mask>
-            </defs>
+        <defs>
+          <mask id="grey-mask">
             <line
-              mask={`url(#gm-${greyLine.key})`}
-              x1={greyLine.x1} y1={greyLine.y1}
-              x2={greyLine.x2} y2={greyLine.y2}
-              stroke="rgba(160,163,178,0.85)"
-              strokeWidth="2.5"
-              strokeDasharray="0 9"
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
+              ref={greyMaskRef}
+              x1="50" y1="50" x2="50" y2="50"
+              pathLength={1}
+              stroke="white"
+              strokeWidth="200"
+              strokeDasharray="1"
+              strokeDashoffset="1"
             />
-          </g>
-        )}
+          </mask>
+          <mask id="beam-mask">
+            <line
+              ref={beamMaskRef}
+              x1="50" y1="50" x2="50" y2="50"
+              pathLength={1}
+              stroke="white"
+              strokeWidth="200"
+              strokeDasharray="0.18 0.82"
+              strokeDashoffset="0.18"
+            />
+          </mask>
+        </defs>
 
-        {/* Colored beam — short colored segment traveling along the grey path.
-             Same two-layer mask architecture as the grey line:
-             mask line uses pathLength="1" for animation math,
-             visual line uses vectorEffect for px-based dot spacing. */}
-        {colorBeam && (
-          <g key={`cb-${colorBeam.key}`}>
-            <defs>
-              <mask id={`bm-${colorBeam.key}`}>
-                <line
-                  x1={colorBeam.x1} y1={colorBeam.y1}
-                  x2={colorBeam.x2} y2={colorBeam.y2}
-                  pathLength={1}
-                  stroke="white"
-                  strokeWidth="200"
-                  strokeDasharray="0.18 0.82"
-                  strokeDashoffset="0.18"
-                >
-                  <animate
-                    ref={(el: SVGAnimateElement | null) => { if (el) el.beginElement() }}
-                    attributeName="stroke-dashoffset"
-                    begin="indefinite"
-                    from="0.18"
-                    to="-1"
-                    dur="0.7s"
-                    fill="freeze"
-                  />
-                </line>
-              </mask>
-            </defs>
-            <line
-              mask={`url(#bm-${colorBeam.key})`}
-              x1={colorBeam.x1} y1={colorBeam.y1}
-              x2={colorBeam.x2} y2={colorBeam.y2}
-              stroke={colorBeam.color}
-              strokeWidth="3"
-              strokeDasharray="0 9"
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-            />
-          </g>
-        )}
+        {/* Grey dotted path */}
+        <line
+          ref={greyVisRef}
+          mask="url(#grey-mask)"
+          x1="50" y1="50" x2="50" y2="50"
+          stroke="rgba(160,163,178,0.85)"
+          strokeWidth="2.5"
+          strokeDasharray="0 9"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+          style={{ display: 'none' }}
+        />
+
+        {/* Colored beam */}
+        <line
+          ref={beamVisRef}
+          mask="url(#beam-mask)"
+          x1="50" y1="50" x2="50" y2="50"
+          stroke="transparent"
+          strokeWidth="3"
+          strokeDasharray="0 9"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+          style={{ display: 'none' }}
+        />
       </svg>
 
       {/* ── Tool logos — appear then float continuously ────────────────── */}
