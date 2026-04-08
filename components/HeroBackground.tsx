@@ -105,7 +105,7 @@ export default function HeroBackground() {
         setCoords(gv, NODE.x, NODE.y, lt.x, lt.y)
         gm.setAttribute('stroke-dashoffset', '1')
         gv.style.display = ''
-        await animateDash(gm, 1, 0, 600)
+        await animateDash(gm, 1, 0, 1200)
         if (!alive.current) break
 
         // ── Step 3: Grey path stays visible ──────────────────────────────
@@ -117,12 +117,12 @@ export default function HeroBackground() {
         bv.setAttribute('stroke', lt.color)
         bm.setAttribute('stroke-dashoffset', '0.18')
         bv.style.display = ''
-        await animateDash(bm, 0.18, -1, 700)
+        await animateDash(bm, 0.18, -1, 1400)
         if (!alive.current) break
         bv.style.display = 'none'
 
         // ── Step 5: Grey path deconstructs tool → nodeloader ─────────────
-        await animateDash(gm, 0, -1, 400)
+        await animateDash(gm, 0, -1, 800)
         if (!alive.current) break
         gv.style.display = 'none'
         setActiveIdx(null)
@@ -132,7 +132,7 @@ export default function HeroBackground() {
         setCoords(gv, NODE.x, NODE.y, rt.x, rt.y)
         gm.setAttribute('stroke-dashoffset', '1')
         gv.style.display = ''
-        await animateDash(gm, 1, 0, 600)
+        await animateDash(gm, 1, 0, 1200)
         if (!alive.current) break
 
         // ── Step 7: Grey path stays visible ──────────────────────────────
@@ -143,7 +143,7 @@ export default function HeroBackground() {
         bv.setAttribute('stroke', rt.color)
         bm.setAttribute('stroke-dashoffset', '0.18')
         bv.style.display = ''
-        await animateDash(bm, 0.18, -1, 700)
+        await animateDash(bm, 0.18, -1, 1400)
         if (!alive.current) break
         bv.style.display = 'none'
 
@@ -156,7 +156,7 @@ export default function HeroBackground() {
         await w(100); if (!alive.current) break
 
         // ── Step 10: Grey path deconstructs tool → nodeloader ────────────
-        await animateDash(gm, 0, -1, 400)
+        await animateDash(gm, 0, -1, 800)
         if (!alive.current) break
         gv.style.display = 'none'
         setActiveIdx(null)
@@ -304,7 +304,7 @@ export default function HeroBackground() {
               pathLength={1}
               stroke="white"
               strokeWidth="200"
-              strokeDasharray="0.18 0.82"
+              strokeDasharray="0.18 2"
               strokeDashoffset="0.18"
             />
           </mask>
