@@ -88,9 +88,8 @@ export default function HeroBackground() {
         await w(700); if (!alive.current) break
         setColorBeam(null)
 
-        // ── Phase 4: Grey path rewinds (erases) ─────────────────────────────
-        lKey.current++
-        setGreyLine({ x1: NODE.x, y1: NODE.y, x2: lt.x, y2: lt.y, phase: 'rewind', key: lKey.current })
+        // ── Phase 4: Grey path rewinds (erases) — same key, just flip phase
+        setGreyLine(prev => prev ? { ...prev, phase: 'rewind' as const } : null)
         await w(400); if (!alive.current) break
         setGreyLine(null)
         setActiveIdx(null)
@@ -114,9 +113,8 @@ export default function HeroBackground() {
         setPulseRing(null)
         await w(100); if (!alive.current) break
 
-        // ── Phase 8: Grey path rewinds (erases) ─────────────────────────────
-        lKey.current++
-        setGreyLine({ x1: NODE.x, y1: NODE.y, x2: rt.x, y2: rt.y, phase: 'rewind', key: lKey.current })
+        // ── Phase 8: Grey path rewinds (erases) — same key, just flip phase
+        setGreyLine(prev => prev ? { ...prev, phase: 'rewind' as const } : null)
         await w(400); if (!alive.current) break
         setGreyLine(null)
         setActiveIdx(null)
@@ -267,6 +265,7 @@ export default function HeroBackground() {
                   strokeDashoffset={greyLine.phase === 'draw' ? 1 : 0}
                 >
                   <animate
+                    key={`${greyLine.key}-${greyLine.phase}`}
                     ref={(el: SVGAnimateElement | null) => { if (el) el.beginElement() }}
                     attributeName="stroke-dashoffset"
                     begin="indefinite"
