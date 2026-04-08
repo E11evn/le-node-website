@@ -292,31 +292,45 @@ export default function HeroBackground() {
         )}
 
         {/* Colored beam — short colored segment traveling along the grey path.
-             Uses pathLength="1" directly on the visual line (no mask needed)
-             with a short dash + SMIL dashoffset animation. */}
+             Same two-layer mask architecture as the grey line:
+             mask line uses pathLength="1" for animation math,
+             visual line uses vectorEffect for px-based dot spacing. */}
         {colorBeam && (
-          <line
-            key={`cb-${colorBeam.key}`}
-            x1={colorBeam.x1} y1={colorBeam.y1}
-            x2={colorBeam.x2} y2={colorBeam.y2}
-            pathLength={1}
-            stroke={colorBeam.color}
-            strokeWidth="3"
-            strokeDasharray="0.12 0.88"
-            strokeDashoffset="0.12"
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          >
-            <animate
-              ref={(el: SVGAnimateElement | null) => { if (el) el.beginElement() }}
-              attributeName="stroke-dashoffset"
-              begin="indefinite"
-              from="0.12"
-              to="-1"
-              dur="0.7s"
-              fill="freeze"
+          <g key={`cb-${colorBeam.key}`}>
+            <defs>
+              <mask id={`bm-${colorBeam.key}`}>
+                <line
+                  x1={colorBeam.x1} y1={colorBeam.y1}
+                  x2={colorBeam.x2} y2={colorBeam.y2}
+                  pathLength={1}
+                  stroke="white"
+                  strokeWidth="200"
+                  strokeDasharray="0.18 0.82"
+                  strokeDashoffset="0.18"
+                >
+                  <animate
+                    ref={(el: SVGAnimateElement | null) => { if (el) el.beginElement() }}
+                    attributeName="stroke-dashoffset"
+                    begin="indefinite"
+                    from="0.18"
+                    to="-1"
+                    dur="0.7s"
+                    fill="freeze"
+                  />
+                </line>
+              </mask>
+            </defs>
+            <line
+              mask={`url(#bm-${colorBeam.key})`}
+              x1={colorBeam.x1} y1={colorBeam.y1}
+              x2={colorBeam.x2} y2={colorBeam.y2}
+              stroke={colorBeam.color}
+              strokeWidth="3"
+              strokeDasharray="0 9"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
             />
-          </line>
+          </g>
         )}
       </svg>
 
