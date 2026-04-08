@@ -27,9 +27,9 @@ Marketing website for le-node, a GTM automation platform with two offerings: an 
 ## Components
 | Component | File | What it does |
 |-----------|------|-------------|
-| Hero | components/Hero.tsx | /os hero: tag badge → h1 → NodeLoader spacer → description → CTA; NodeLoader absolutely centered |
-| HeroBackground | components/HeroBackground.tsx | Animated background: grid lines, 12 floating tool icons, grey connection lines + colored beam sparks cycling between tools and NodeLoader |
-| NodeLoader | components/NodeLoader.tsx | 120px spinning-rings loader in brand palette (blue #0043FA / dark #1D1D22); no text |
+| Hero | components/Hero.tsx | /os hero (80vh max): tag badge → h1 → NodeLoader spacer (120px) → description → CTA; NodeLoader absolutely centered |
+| HeroBackground | components/HeroBackground.tsx | Animated background: grid lines, 12 floating tool icons, grey connection paths (stroke-dashoffset progressive draw) + colored beam pulses (same-width overlay traveling inside path) cycling between tools and NodeLoader |
+| NodeLoader | components/NodeLoader.tsx | 90px spinning-rings loader in brand palette (blue #0043FA / dark #1D1D22); no text |
 | Nav | components/Nav.tsx | Sticky nav; context-aware CTA (waitlist vs book-a-call) via usePathname |
 | Footer | components/Footer.tsx | Links to all pages + copyright |
 | SplitScreen | components/SplitScreen.tsx | Home page two-panel layout with hover overlays and scale effect |
@@ -61,8 +61,8 @@ Marketing website for le-node, a GTM automation platform with two offerings: an 
 - Brand colors: blue `#0043FA` (OS/product), orange `#FA7900` (agence), dark `#1D1D22` (text/UI)
 - Percentage-based positioning for HeroBackground tool icons (x/y in 0–100 space matching a 100×100 SVG viewBox)
 - SVG animations always use `pathLength="1"` + `stroke-dasharray/dashoffset` — never bare pixel dash values (they complete in <10% of duration)
-- Grey dotted connection line uses `stroke-dasharray="0 0.06"` + `strokeLinecap="round"` for evenly-spaced round dots; directional reveal/hide is handled by a white cover line (`stroke-dasharray="1"`) animated separately on top
-- Traveling beam uses `stroke-dasharray="0.2 0.8"` with `dashoffset 0.2 → -0.8` — sends a 20%-length beam from x1 to x2 in exactly one path traversal
+- Grey connection path: solid 2px line, draws progressively via `stroke-dasharray="1"` + `dashoffset 1→0` (600ms ease-out); erases via `dashoffset 0→-1` (400ms ease-in)
+- Traveling beam: 2px colored line (same width as grey path — runs *inside* it, not on top), `stroke-dasharray="0.15 0.85"` with `dashoffset 0.15→-1` (700ms ease-in-out) — a 15%-length pulse sweeps start to end
 - `'use client'` required on any component using useState/useEffect/usePathname
 - Sections get animated top border via SectionLineObserver unless they have the `no-top-line` class
 - Agency components live in `components/agency/`
@@ -76,5 +76,5 @@ Marketing website for le-node, a GTM automation platform with two offerings: an 
 - HeroBackground animation refactored: beam now uses `pathLength="1"` pattern to fix sub-10% completion bug
 - Hero redesign (/os): added "AI-native operating system" pill tag above h1; moved CTA below description paragraph; replaced CTA beam target with NodeLoader (spinning ring, blue/dark palette); animation rearchitected to 8-phase cycle (left tool activates → grey line draws node→tool → colored spark travels tool→node → line rewinds → grey line draws node→right tool → colored spark travels node→tool → right tool activates → line rewinds); Clay logo reduced from 38px to 28px; hero min-height increased to 100vh
 - NodeLoader refined: scaled to 120px; hero spacer reduced to 180px
-- HeroBackground connection line reworked: now renders evenly-spaced round dots (`stroke-dasharray="0 0.06"`, `strokeLinecap="round"`, `strokeWidth="2"`, `pathLength="1"`); directional draw/rewind handled by a white cover line animated with `dashoffset 0→-1` (peel) and `dashoffset 1→0` (cover), each 400ms
-- Beam reworked: `stroke-dasharray="0.2 0.8"`, `dashoffset 0.2→-0.8`, 900ms — beam enters from x1, travels full path, exits past x2; glow 8px/25% opacity + 2px bright core
+- HeroBackground animation fully rewritten: grey path is now a solid 2px line that builds progressively via `stroke-dashoffset` (no more dotted pattern or white cover technique); beam is a same-width 2px colored pulse that travels inside the grey path (no separate glow layer); timings: draw 600ms, beam 700ms, rewind 400ms
+- Hero reduced to 80vh max; NodeLoader scaled from 120px to 90px; spacer reduced from 180px to 120px

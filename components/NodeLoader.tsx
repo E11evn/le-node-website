@@ -2,7 +2,7 @@
 
 export default function NodeLoader() {
   return (
-    <div className="relative w-[120px] h-[120px] flex items-center justify-center">
+    <div className="relative w-[90px] h-[90px] flex items-center justify-center">
 
       {/* Base Glow */}
       <div
@@ -23,7 +23,7 @@ export default function NodeLoader() {
       <div
         className="absolute rounded-full border-[2px] border-transparent animate-[spin_2s_linear_infinite]"
         style={{
-          inset: '4px',
+          inset: '3px',
           borderTopColor: '#0043FA',
           boxShadow: '0 0 7px rgba(0,67,250,0.45)',
         }}
@@ -33,7 +33,7 @@ export default function NodeLoader() {
       <div
         className="absolute rounded-full border-[2px] border-transparent animate-[spin_3s_linear_infinite_reverse]"
         style={{
-          inset: '13px',
+          inset: '10px',
           borderBottomColor: 'rgba(29,29,34,0.5)',
           boxShadow: '0 0 5px rgba(29,29,34,0.15)',
         }}
@@ -43,7 +43,7 @@ export default function NodeLoader() {
       <div
         className="absolute rounded-full border border-transparent animate-[spin_1s_ease-in-out_infinite]"
         style={{
-          inset: '23px',
+          inset: '17px',
           borderLeftColor: 'rgba(0,67,250,0.55)',
         }}
       />
@@ -51,7 +51,7 @@ export default function NodeLoader() {
       {/* Orbital Dot */}
       <div className="absolute inset-0 animate-[spin_4s_linear_infinite]">
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full"
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[4px] h-[4px] rounded-full"
           style={{
             background: '#0043FA',
             boxShadow: '0 0 4px rgba(0,67,250,0.9)',

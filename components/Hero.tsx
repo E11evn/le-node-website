@@ -6,7 +6,7 @@ export default function Hero() {
   return (
     <section
       className="relative overflow-hidden bg-white no-top-line"
-      style={{ minHeight: '100vh', paddingTop: '6rem', paddingBottom: '4rem', display: 'flex', alignItems: 'center' }}
+      style={{ minHeight: '80vh', maxHeight: '80vh', paddingTop: '6rem', paddingBottom: '4rem', display: 'flex', alignItems: 'center' }}
     >
       {/* Layer 1 — animated background (grid + floating icons) */}
       <HeroBackground />
@@ -32,7 +32,7 @@ export default function Hero() {
         </h1>
 
         {/* Spacer — reserves vertical room for the NodeLoader */}
-        <div style={{ height: '180px' }} />
+        <div style={{ height: '120px' }} />
 
         <p className="text-lg text-gray-500 max-w-lg mx-auto leading-relaxed mb-10">
           le-node handles the research, outreach, and enrichment — so your team
