@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 
 // Tool positions matched from reference 100% opacity.png
 const TOOLS = [
-  { id: 'clay',        x: 19, y: 21, logoSize: 28, color: '#D4A84B' },
+  { id: 'clay',        x: 19, y: 21, logoSize: 28, color: '#EF4444' },  // red
   { id: 'dropcontact', x: 34, y: 23, logoSize: 38, color: '#3B5BDB' },
   { id: 'salesforce',  x: 72, y: 27, logoSize: 38, color: '#00A1E0' },
   { id: 'hubspot',     x: 86, y: 18, logoSize: 38, color: '#FF7A59' },
@@ -34,7 +34,11 @@ const RIGHT_INDICES = TOOLS.map((_, i) => i).filter(i => TOOLS[i].x >= 50)
 // NodeLoader center position
 const NODE = { x: 50, y: 50 }
 
-export default function HeroBackground() {
+interface Props {
+  onSetComputing: (v: boolean) => void
+}
+
+export default function HeroBackground({ onSetComputing }: Props) {
   const [activeIdx, setActiveIdx] = useState<number | null>(null)
   const [pulseRing, setPulseRing] = useState<{ idx: number; key: number } | null>(null)
 
@@ -44,8 +48,9 @@ export default function HeroBackground() {
   const beamMaskRef = useRef<SVGLineElement>(null)
   const beamVisRef  = useRef<SVGLineElement>(null)
 
-  const leftCursor  = useRef(0)
-  const rightCursor = useRef(0)
+  // Start at index 2 in each cursor so Google (left) + Slack (right) fire first
+  const leftCursor  = useRef(2)
+  const rightCursor = useRef(2)
   const pKey        = useRef(0)
   const alive       = useRef(true)
 
@@ -127,6 +132,12 @@ export default function HeroBackground() {
         gv.style.display = 'none'
         setActiveIdx(null)
 
+        // ── Step 5b: NodeLoader computing pulse ───────────────────────────
+        onSetComputing(true)
+        await w(1400); if (!alive.current) break
+        onSetComputing(false)
+        await w(200); if (!alive.current) break
+
         // ── Step 6: Grey path builds nodeloader → right tool ─────────────
         setCoords(gm, NODE.x, NODE.y, rt.x, rt.y)
         setCoords(gv, NODE.x, NODE.y, rt.x, rt.y)
@@ -168,7 +179,7 @@ export default function HeroBackground() {
 
     const t = setTimeout(() => { if (alive.current) loop() }, 2000)
     return () => { alive.current = false; clearTimeout(t) }
-  }, [])
+  }, [onSetComputing])
 
   return (
     <div className="absolute inset-0 overflow-hidden select-none" style={{ background: '#FFFFFF' }}>
@@ -308,6 +319,14 @@ export default function HeroBackground() {
               strokeDashoffset="0.18"
             />
           </mask>
+          {/* Glow filter for beam */}
+          <filter id="beam-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
 
         {/* Grey dotted path */}
@@ -323,16 +342,17 @@ export default function HeroBackground() {
           style={{ display: 'none' }}
         />
 
-        {/* Colored beam */}
+        {/* Colored beam — brighter with glow filter */}
         <line
           ref={beamVisRef}
           mask="url(#beam-mask)"
           x1="50" y1="50" x2="50" y2="50"
           stroke="transparent"
-          strokeWidth="3"
+          strokeWidth="4"
           strokeDasharray="0 9"
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
+          filter="url(#beam-glow)"
           style={{ display: 'none' }}
         />
       </svg>
