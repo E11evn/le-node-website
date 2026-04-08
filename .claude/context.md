@@ -61,8 +61,9 @@ Marketing website for le-node, a GTM automation platform with two offerings: an 
 - Brand colors: blue `#0043FA` (OS/product), orange `#FA7900` (agence), dark `#1D1D22` (text/UI)
 - Percentage-based positioning for HeroBackground tool icons (x/y in 0–100 space matching a 100×100 SVG viewBox)
 - SVG animations always use `pathLength="1"` + `stroke-dasharray/dashoffset` — never bare pixel dash values (they complete in <10% of duration)
-- Grey connection path: solid 2px line, draws progressively via `stroke-dasharray="1"` + `dashoffset 1→0` (600ms ease-out); erases via `dashoffset 0→-1` (400ms ease-in)
-- Traveling beam: 2px colored line (same width as grey path — runs *inside* it, not on top), `stroke-dasharray="0.15 0.85"` with `dashoffset 0.15→-1` (700ms ease-in-out) — a 15%-length pulse sweeps start to end
+- Grey path + beam use SVG SMIL `<animate>` (not CSS @keyframes) for dash properties — CSS can misinterpret unitless dasharray/dashoffset values as px instead of pathLength units, especially with `preserveAspectRatio="none"`
+- Grey connection path: solid 2px line, draws progressively via SVG `<animate>` dashoffset `1→0` (0.6s); retracts via dashoffset `0→1` (0.4s, erases from destination back to origin)
+- Traveling beam: 2px colored line (same width as grey path — runs *inside* it, not on top), `dasharray="0.15 0.85"` with `<animate>` dashoffset `0.15→-1` (0.7s) — a 15%-length pulse sweeps start to end
 - `'use client'` required on any component using useState/useEffect/usePathname
 - Sections get animated top border via SectionLineObserver unless they have the `no-top-line` class
 - Agency components live in `components/agency/`
@@ -76,5 +77,5 @@ Marketing website for le-node, a GTM automation platform with two offerings: an 
 - HeroBackground animation refactored: beam now uses `pathLength="1"` pattern to fix sub-10% completion bug
 - Hero redesign (/os): added "AI-native operating system" pill tag above h1; moved CTA below description paragraph; replaced CTA beam target with NodeLoader (spinning ring, blue/dark palette); animation rearchitected to 8-phase cycle (left tool activates → grey line draws node→tool → colored spark travels tool→node → line rewinds → grey line draws node→right tool → colored spark travels node→tool → right tool activates → line rewinds); Clay logo reduced from 38px to 28px; hero min-height increased to 100vh
 - NodeLoader refined: scaled to 120px; hero spacer reduced to 180px
-- HeroBackground animation fully rewritten: grey path is now a solid 2px line that builds progressively via `stroke-dashoffset` (no more dotted pattern or white cover technique); beam is a same-width 2px colored pulse that travels inside the grey path (no separate glow layer); timings: draw 600ms, beam 700ms, rewind 400ms
+- HeroBackground animation fully rewritten: grey path + beam now use SVG SMIL `<animate>` instead of CSS @keyframes for dash properties (fixes CSS unit misinterpretation with pathLength); rewind direction changed to retract from destination back to origin (dashoffset 0→1); grey line opacity increased to 0.8
 - Hero reduced to 80vh max; NodeLoader scaled from 120px to 90px; spacer reduced from 180px to 120px

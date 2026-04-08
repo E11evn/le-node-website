@@ -214,38 +214,8 @@ export default function HeroBackground() {
           animation: hbPulseRing 700ms ease-out forwards;
         }
 
-        /* ── Grey path — draws progressively from origin to destination ── */
-        @keyframes hbLineDraw {
-          from { stroke-dashoffset: 1; }
-          to   { stroke-dashoffset: 0; }
-        }
-        .hb-line-draw {
-          stroke-dasharray: 1;
-          stroke-dashoffset: 1;
-          animation: hbLineDraw 600ms ease-out forwards;
-        }
-
-        /* ── Grey path — erases from origin to destination ────────────── */
-        @keyframes hbLineRewind {
-          from { stroke-dashoffset: 0; }
-          to   { stroke-dashoffset: -1; }
-        }
-        .hb-line-rewind {
-          stroke-dasharray: 1;
-          stroke-dashoffset: 0;
-          animation: hbLineRewind 400ms ease-in forwards;
-        }
-
-        /* ── Colored beam — short pulse traveling inside the grey path ── */
-        @keyframes hbBeamTravel {
-          from { stroke-dashoffset: 0.15; }
-          to   { stroke-dashoffset: -1; }
-        }
-        .hb-beam-travel {
-          stroke-dasharray: 0.15 0.85;
-          stroke-dashoffset: 0.15;
-          animation: hbBeamTravel 700ms ease-in-out forwards;
-        }
+        /* (Grey path + beam animations use SVG <animate> elements,
+            not CSS keyframes — ensures pathLength mapping is correct) */
       `}</style>
 
       {/* ── Grid lines ─────────────────────────────────────────────────── */}
@@ -275,34 +245,52 @@ export default function HeroBackground() {
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
       >
-        {/* Grey connection path — builds progressively via stroke-dashoffset */}
+        {/* Grey connection path — SMIL <animate> for reliable pathLength mapping */}
         {greyLine && (
           <line
             key={`gl-${greyLine.key}`}
-            className={greyLine.phase === 'draw' ? 'hb-line-draw' : 'hb-line-rewind'}
             x1={greyLine.x1} y1={greyLine.y1}
             x2={greyLine.x2} y2={greyLine.y2}
             pathLength={1}
-            stroke="rgba(180,182,195,0.6)"
+            stroke="rgba(160,163,178,0.8)"
             strokeWidth="2"
             strokeLinecap="round"
+            strokeDasharray="1"
+            strokeDashoffset={greyLine.phase === 'draw' ? 1 : 0}
             vectorEffect="non-scaling-stroke"
-          />
+          >
+            <animate
+              attributeName="stroke-dashoffset"
+              from={greyLine.phase === 'draw' ? '1' : '0'}
+              to={greyLine.phase === 'draw' ? '0' : '1'}
+              dur={greyLine.phase === 'draw' ? '0.6s' : '0.4s'}
+              fill="freeze"
+            />
+          </line>
         )}
 
         {/* Colored beam — same 2px width, travels inside the grey path */}
         {colorBeam && (
           <line
             key={`cb-${colorBeam.key}`}
-            className="hb-beam-travel"
             x1={colorBeam.x1} y1={colorBeam.y1}
             x2={colorBeam.x2} y2={colorBeam.y2}
             pathLength={1}
             stroke={colorBeam.color}
             strokeWidth="2"
             strokeLinecap="round"
+            strokeDasharray="0.15 0.85"
+            strokeDashoffset="0.15"
             vectorEffect="non-scaling-stroke"
-          />
+          >
+            <animate
+              attributeName="stroke-dashoffset"
+              from="0.15"
+              to="-1"
+              dur="0.7s"
+              fill="freeze"
+            />
+          </line>
         )}
       </svg>
 
