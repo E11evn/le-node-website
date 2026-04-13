@@ -4,8 +4,12 @@ export default function AgencyHero() {
   return (
     <section className="pt-24 pb-16 md:pt-32 md:pb-20">
       <div className="container-content text-center max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wide mb-8 text-white" style={{ background: 'linear-gradient(to right, #FA7900, #FA9E00)' }}>
-          GTM Consulting
+        <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#FA7900] bg-[#FFF1E0] mb-6">
+          <span
+            className="animate-dot-glow"
+            style={{ width: 10, height: 10, borderRadius: '50%', background: '#FA7900', display: 'inline-block', flexShrink: 0, ['--glow-color' as string]: 'rgba(250, 121, 0, 0.6)' }}
+          />
+          <span style={{ color: '#FA7900', fontSize: '1rem', fontWeight: 500 }}>le-node as an agency</span>
         </div>
 
         <h1 className="text-display font-bold text-foreground mb-6">

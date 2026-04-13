@@ -71,3 +71,30 @@
            hover:border-gray-300 transition-colors duration-150;
   }
 }
+
+@layer utilities {
+  /* Glowing pulse for tag dots — uses --glow-color custom property
+     so the same animation works for any brand color. */
+  @keyframes dot-glow {
+    0%, 100% {
+      box-shadow: 0 0 0 0 var(--glow-color, rgba(0, 67, 250, 0.6)),
+                  0 0 4px 1px var(--glow-color, rgba(0, 67, 250, 0.3));
+      opacity: 0.85;
+    }
+    50% {
+      box-shadow: 0 0 8px 3px var(--glow-color, rgba(0, 67, 250, 0.7)),
+                  0 0 16px 6px var(--glow-color, rgba(0, 67, 250, 0.35));
+      opacity: 1;
+    }
+  }
+
+  .animate-dot-glow {
+    animation: dot-glow 2s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-dot-glow {
+      animation: none;
+    }
+  }
+}

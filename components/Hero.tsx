@@ -26,7 +26,10 @@ export default function Hero() {
         {/* Tag + h1 raised slightly higher */}
         <div style={{ marginTop: '-48px' }}>
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#0043FA] bg-[#EEF3FF] mb-6">
-            <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#0043FA', display: 'inline-block', flexShrink: 0 }} />
+            <span
+              className="animate-dot-glow"
+              style={{ width: 10, height: 10, borderRadius: '50%', background: '#0043FA', display: 'inline-block', flexShrink: 0, ['--glow-color' as string]: 'rgba(0, 67, 250, 0.6)' }}
+            />
             <span style={{ color: '#0043FA', fontSize: '1rem', fontWeight: 500 }}>AI-native operating system</span>
           </div>
 
