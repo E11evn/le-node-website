@@ -9,7 +9,7 @@ export default function Footer() {
         </Link>
 
         <div className="flex items-center gap-8">
-          <Link href="/os" className="text-sm text-muted hover:text-foreground transition-colors">
+          <Link href="/" className="text-sm text-muted hover:text-foreground transition-colors">
             le node OS
           </Link>
           <Link href="/agence" className="text-sm text-muted hover:text-foreground transition-colors">

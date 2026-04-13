@@ -26,7 +26,7 @@ export default function Nav() {
         {/* Center: Mode toggle */}
         <div className="flex items-center gap-1 rounded-full bg-white/5 p-1">
           <Link
-            href="/os"
+            href="/"
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ease-in-out ${
               !isAgency
                 ? 'text-white shadow-sm'

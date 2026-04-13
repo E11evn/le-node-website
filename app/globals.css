@@ -19,21 +19,39 @@
     @apply py-20 md:py-28 relative;
   }
 
-  /* Animated top border — replaces static border-t border-border.
-     Triggered by .line-visible class added via SectionLineObserver
-     when the section scrolls into view. Skipped on .no-top-line sections. */
+  /* Unified structural-line color — used by horizontal section dividers
+     and the fixed vertical frame lines. Neutral gray that reads on both
+     light and dark section backgrounds. */
+  :root {
+    --line-color: rgba(128, 128, 128, 0.22);
+  }
+
+  /* Animated top border on every section that doesn't opt out.
+     Triggered by .line-visible added via ScrollReveal when the section
+     scrolls into view. Matches the hero beam easing (0.8s ease-out cubic). */
   section:not(.no-top-line)::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 1px;
-    background-color: #E5E7EB;
+    background-color: var(--line-color);
     transform: scaleX(0);
     transform-origin: 0% 50%;
     transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
   section.line-visible:not(.no-top-line)::before {
     transform: scaleX(1);
+  }
+
+  /* Fixed vertical frame lines — draw top → bottom on initial paint. */
+  .vline {
+    background: var(--line-color);
+    transform: scaleY(0);
+    transform-origin: 50% 0%;
+    animation: vline-draw 1s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s forwards;
+  }
+  @keyframes vline-draw {
+    to { transform: scaleY(1); }
   }
 }
 
@@ -73,6 +91,22 @@
 }
 
 @layer utilities {
+  /* Scroll-reveal primitive — auto-applied to section content children
+     by <ScrollReveal />. Initial: 14px below, invisible. Revealed: in place,
+     visible. Staggered via --reveal-delay (set by the observer per index). */
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) var(--reveal-delay, 0ms),
+      transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+  .reveal.revealed {
+    opacity: 1;
+    transform: none;
+  }
+
   /* Glowing pulse for tag dots — uses --glow-color custom property
      so the same animation works for any brand color. */
   @keyframes dot-glow {
@@ -91,8 +125,11 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .animate-dot-glow {
-      animation: none;
+    .animate-dot-glow { animation: none; }
+    .vline { animation: none; transform: scaleY(1); }
+    .reveal, .reveal.revealed {
+      opacity: 1; transform: none; transition: none;
     }
+    section:not(.no-top-line)::before { transition: none; transform: scaleX(1); }
   }
 }

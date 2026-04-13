@@ -9,7 +9,7 @@ export default function Hero() {
 
   return (
     <section
-      className="relative overflow-hidden bg-white no-top-line"
+      className="relative overflow-hidden bg-white no-top-line no-reveal"
       style={{ minHeight: '80vh', maxHeight: '80vh', paddingTop: '6rem', paddingBottom: '4rem', display: 'flex', alignItems: 'center' }}
     >
       {/* Layer 1 — animated background (grid + floating icons) */}

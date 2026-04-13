@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function AgencyHero() {
   return (
-    <section className="pt-24 pb-16 md:pt-32 md:pb-20">
+    <section className="pt-24 pb-16 md:pt-32 md:pb-20 no-reveal">
       <div className="container-content text-center max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#FA7900] bg-[#FFF1E0] mb-6">
           <span

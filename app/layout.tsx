@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import './globals.css'
-import SectionLineObserver from '@/components/SectionLineObserver'
+import ScrollReveal from '@/components/ScrollReveal'
 
 export const metadata: Metadata = {
   title: 'le-node — GTM on autopilot',
@@ -27,11 +27,11 @@ export default function RootLayout({
         {/* Site-wide structural frame: left and right content boundaries */}
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[1]">
           <div className="relative h-full max-w-[72rem] mx-auto">
-            <div className="absolute left-0  top-0 bottom-0 w-px" style={{ background: 'rgba(128,128,128,0.18)' }} />
-            <div className="absolute right-0 top-0 bottom-0 w-px" style={{ background: 'rgba(128,128,128,0.18)' }} />
+            <div className="vline absolute left-0  top-0 bottom-0 w-px" />
+            <div className="vline absolute right-0 top-0 bottom-0 w-px" />
           </div>
         </div>
-        <SectionLineObserver />
+        <ScrollReveal />
         {children}
       </body>
     </html>
