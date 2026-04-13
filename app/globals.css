@@ -77,13 +77,11 @@
      so the same animation works for any brand color. */
   @keyframes dot-glow {
     0%, 100% {
-      box-shadow: 0 0 0 0 var(--glow-color, rgba(0, 67, 250, 0.6)),
-                  0 0 4px 1px var(--glow-color, rgba(0, 67, 250, 0.3));
-      opacity: 0.85;
+      box-shadow: 0 0 0 0 var(--glow-color, rgba(0, 67, 250, 0.5));
+      opacity: 0.45;
     }
     50% {
-      box-shadow: 0 0 8px 3px var(--glow-color, rgba(0, 67, 250, 0.7)),
-                  0 0 16px 6px var(--glow-color, rgba(0, 67, 250, 0.35));
+      box-shadow: 0 0 4px 1px var(--glow-color, rgba(0, 67, 250, 0.6));
       opacity: 1;
     }
   }
