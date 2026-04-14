@@ -55,9 +55,9 @@ export default function Hero() {
           </Link>
           <a
             href="#how-it-works"
-            className="text-base font-medium text-[#0043FA] hover:underline"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-[#1D1D22] bg-transparent text-base font-medium text-[#1D1D22] hover:bg-black/5 transition-colors duration-150"
           >
-            Discover how that works →
+            Discover how that works
           </a>
         </div>
 
