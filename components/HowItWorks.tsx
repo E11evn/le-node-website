@@ -15,7 +15,7 @@ const steps = [
     number: '03',
     title: 'Engage on autopilot',
     description:
-      'le-node finds your leads' contact info to engage them in relevant conversations and generate opportunities, on autopilot.',
+      "le-node finds your leads' contact info to engage them in relevant conversations and generate opportunities, on autopilot.",
   },
   {
     number: '04',
