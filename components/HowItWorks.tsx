@@ -1,21 +1,33 @@
 const steps = [
   {
     number: '01',
-    title: 'Connect',
+    title: 'Learn your ICP',
     description:
-      'Link your CRM, Clay account, and outreach tools. Takes 5 minutes. No engineering required.',
+      'le-node connects to your existing business data to learn who your ideal customer is.',
   },
   {
     number: '02',
-    title: 'Define',
+    title: 'Detect & qualify',
     description:
-      "Tell le-node your ICP, your sequences, your enrichment rules. Plain language, not code.",
+      'le-node detects intent signals, qualifies and scores prospects based on your ideal customer profile.',
   },
   {
     number: '03',
-    title: 'Run',
+    title: 'Engage on autopilot',
     description:
-      'Activate your workflows. le-node sources, enriches, and reaches out — continuously, automatically.',
+      'le-node finds your leads' contact info to engage them in relevant conversations and generate opportunities, on autopilot.',
+  },
+  {
+    number: '04',
+    title: 'Sync your stack',
+    description:
+      'Then syncs back to your stack to maintain your CRM up to date, and hands over opportunities where your team already works.',
+  },
+  {
+    number: '05',
+    title: 'Optimize continuously',
+    description:
+      'Track performance — le-node continuously learns from results to enhance your outbound approach.',
   },
 ]
 
@@ -23,23 +35,35 @@ export default function HowItWorks() {
   return (
     <section id="how-it-works">
       <div className="container-content">
-        <span className="section-eyebrow">How it works</span>
+        <span className="section-eyebrow">How does it work</span>
         <h2 className="text-display-sm font-bold text-foreground mb-16 max-w-lg">
-          From zero to running in three steps.
+          Plug and play. 24/7. Dead easy.
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-8 relative">
-          <div className="hidden md:block absolute top-8 left-[16.66%] right-[16.66%] h-px bg-border" />
+        {/* Vertical timeline */}
+        <div className="relative max-w-2xl">
+          {/* Vertical spine */}
+          <div className="absolute left-[27px] top-0 bottom-0 w-px bg-border" />
 
-          {steps.map(({ number, title, description }) => (
-            <div key={number} className="relative">
-              <div className="w-16 h-16 rounded-2xl bg-white border border-border flex items-center justify-center font-bold text-lg text-accent mb-6 relative z-10">
-                {number}
+          <div className="flex flex-col gap-10">
+            {steps.map(({ number, title, description }) => (
+              <div key={number} className="flex gap-8 items-start relative">
+                {/* Number badge */}
+                <div
+                  className="flex-shrink-0 w-14 h-14 rounded-2xl bg-white border border-border flex items-center justify-center font-bold text-sm text-accent relative z-10"
+                  style={{ background: 'white' }}
+                >
+                  {number}
+                </div>
+
+                {/* Content */}
+                <div className="pt-3">
+                  <h3 className="font-semibold text-foreground text-lg mb-1">{title}</h3>
+                  <p className="text-muted text-sm leading-relaxed">{description}</p>
+                </div>
               </div>
-              <h3 className="font-semibold text-foreground text-lg mb-3">{title}</h3>
-              <p className="text-muted text-sm leading-relaxed">{description}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

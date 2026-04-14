@@ -36,9 +36,12 @@ export default function WhyLeNode() {
     <section>
       <div className="container-content">
         <span className="section-eyebrow">Why le-node</span>
-        <h2 className="text-display-sm font-bold text-foreground mb-12 max-w-lg">
-          Built for revenue teams, not engineers.
+        <h2 className="text-display-sm font-bold text-foreground mb-4 max-w-lg">
+          Best-in-class GTM stack.
         </h2>
+        <p className="text-muted text-lg mb-12 max-w-xl">
+          le-node natively connects your stack to the best performing GTM tools in the industry.
+        </p>
 
         <div className="grid md:grid-cols-3 gap-6">
           {differentiators.map(({ icon, title, description }) => (

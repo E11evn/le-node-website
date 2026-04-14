@@ -34,9 +34,9 @@ export default function Hero() {
           </div>
 
           <h1 className="text-display font-bold text-[#1D1D22] mb-4">
-            Your entire GTM motion.
+            Your GTM Motion,
             <br />
-            <span style={{ color: '#0043FA' }}>On autopilot.</span>
+            <span style={{ color: '#0043FA' }}>on Autopilot.</span>
           </h1>
         </div>
 
@@ -44,15 +44,21 @@ export default function Hero() {
         <div style={{ height: '100px' }} />
 
         <p className="text-lg text-gray-500 max-w-lg mx-auto leading-relaxed mb-10">
-          le-node handles the research, outreach, and enrichment — so your team
-          focuses on closing. No code. No complexity. Just pipeline.
+          le-node orchestrates the best-in-class GTM tools to automatically identify
+          and engage with your ideal customers, and gets back to you with opportunities.
         </p>
 
-        {/* Primary CTA */}
-        <div>
+        {/* CTAs */}
+        <div className="flex items-center justify-center gap-4 flex-wrap">
           <Link href="/waitlist" className="btn-primary text-base px-6 py-3">
             Join waitlist
           </Link>
+          <a
+            href="#how-it-works"
+            className="text-base font-medium text-[#0043FA] hover:underline"
+          >
+            Discover how that works →
+          </a>
         </div>
 
       </div>
