@@ -20,23 +20,21 @@ const OUTER_RING = [
   { id: 'pipedrive',   logoSize: 30 },
 ]
 
-// Animation center — left: 50%, top: 55%
-const ANIM_CENTER_TOP = '55%'
+// All layers keyed off one constant — change here to move everything together
+const ANIM_CENTER_TOP = '62%'
 
-// ─── Ripple component ─────────────────────────────────────────────────────
-// Circles are direct children of a 0×0 container centered on the animation
-// center. The keyframe starts with translate(-50%,-50%) so each circle is
-// centered on that origin point. No inset:0 wrapper (would clip in 0×0 ctx).
+// ─── Ripple — twice smaller than the original ─────────────────────────────
+// Direct children of a 0×0 container; keyframe translate(-50%,-50%) centers.
 function Ripple() {
   const NUM   = 7
-  const START = 110
-  const STEP  = 58
+  const START = 55   // was 110
+  const STEP  = 29   // was 58
 
   return (
     <>
       {Array.from({ length: NUM }, (_, i) => {
         const size    = START + i * STEP
-        const opacity = Math.max(0.26 - i * 0.030, 0.03)
+        const opacity = Math.max(0.28 - i * 0.032, 0.03)
         return (
           <div
             key={i}
@@ -72,8 +70,8 @@ function OrbitRing({
   duration: number
   reverse: boolean
 }) {
-  const total      = tools.length
-  const orbitAnim  = reverse ? 'orbit-ccw' : 'orbit-cw'
+  const total       = tools.length
+  const orbitAnim   = reverse ? 'orbit-ccw' : 'orbit-cw'
   const counterAnim = reverse ? 'counter-ccw' : 'counter-cw'
 
   return (
@@ -95,23 +93,23 @@ function OrbitRing({
           >
             <div
               style={{
-                position:         'absolute',
-                left:              radius,
-                top:               0,
-                transform:        'translate(-50%, -50%)',
-                animation:        `${counterAnim} ${duration}s linear infinite`,
-                animationDelay:   `${delay}s`,
-                width:             42,
-                height:            42,
-                background:       'rgba(240, 242, 255, 0.06)',
-                border:           '1px solid rgba(240, 242, 255, 0.12)',
-                borderRadius:      10,
-                backdropFilter:   'blur(6px)',
+                position:             'absolute',
+                left:                  radius,
+                top:                   0,
+                transform:            'translate(-50%, -50%)',
+                animation:            `${counterAnim} ${duration}s linear infinite`,
+                animationDelay:       `${delay}s`,
+                width:                 42,
+                height:                42,
+                background:           'rgba(240, 242, 255, 0.06)',
+                border:               '1px solid rgba(240, 242, 255, 0.12)',
+                borderRadius:          10,
+                backdropFilter:       'blur(6px)',
                 WebkitBackdropFilter: 'blur(6px)',
-                display:          'flex',
-                alignItems:       'center',
-                justifyContent:   'center',
-                boxShadow:        '0 2px 10px rgba(0,0,0,0.4)',
+                display:              'flex',
+                alignItems:           'center',
+                justifyContent:       'center',
+                boxShadow:            '0 2px 10px rgba(0,0,0,0.4)',
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -131,46 +129,55 @@ function OrbitRing({
   )
 }
 
-// ─── Main component ───────────────────────────────────────────────────────
+// ─── Hero ─────────────────────────────────────────────────────────────────
 export default function SandboxHero() {
   return (
     <section
       className="no-top-line"
-      style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', background: '#0F0F11', padding: 0 }}
+      style={{
+        position: 'relative', width: '100vw', height: '100vh',
+        overflow: 'hidden', background: '#0F0F11', padding: 0,
+      }}
     >
       <style>{`
-        /* Orbit keyframes */
-        @keyframes orbit-cw   { to { transform: rotate(360deg);   } }
-        @keyframes orbit-ccw  { to { transform: rotate(-360deg);  } }
+        @keyframes orbit-cw    { to { transform: rotate(360deg);  } }
+        @keyframes orbit-ccw   { to { transform: rotate(-360deg); } }
         @keyframes counter-cw  { to { transform: translate(-50%,-50%) rotate(-360deg); } }
         @keyframes counter-ccw { to { transform: translate(-50%,-50%) rotate(360deg);  } }
 
-        /* Ripple keyframe */
         @keyframes ripple-pulse {
           0%, 100% { transform: translate(-50%,-50%) scale(1);    }
           50%       { transform: translate(-50%,-50%) scale(0.94); }
         }
 
-        /* Input placeholder */
         .sb-email::placeholder { color: #9C9C9C; }
         .sb-email:focus { outline: none; border-color: rgba(0,67,250,0.5); }
       `}</style>
 
-      {/* ── L0: Black hole video ──────────────────────────────────────── */}
+      {/* ── L0: Black hole video — taller than viewport so the visual
+           center of the black hole aligns with ANIM_CENTER_TOP.
+           height: 124% → black hole (at 50% of video) appears at
+           50% × 124% = 62% from top of viewport.               ──── */}
       <video
         autoPlay muted loop playsInline
         src="/nodesingularity.webm"
         style={{
-          position: 'absolute', inset: 0, width: '100%', height: '100%',
-          objectFit: 'cover', zIndex: 0,
+          position:   'absolute',
+          top:         0,
+          left:        0,
+          width:       '100%',
+          height:      '124%',
+          objectFit:  'cover',
+          objectPosition: 'center center',
+          zIndex:      0,
         }}
       />
 
-      {/* ── L1: Layer dark — darkens the whole scene ──────────────────── */}
+      {/* ── L1: Layer dark — 30% less opaque than before (was 0.60) ───── */}
       <div
         style={{
           position: 'absolute', inset: 0, zIndex: 1,
-          background: 'rgba(15,15,17,0.60)',
+          background: 'rgba(15,15,17,0.42)',
           pointerEvents: 'none',
         }}
       />
@@ -187,7 +194,7 @@ export default function SandboxHero() {
         <OrbitRing tools={OUTER_RING}  radius={248} duration={102} reverse={false} />
       </div>
 
-      {/* ── L3: Dark gradient tools — vignette over orbital area ─────── */}
+      {/* ── L3: Dark gradient tools — radial vignette, center = anim center */}
       <div
         style={{
           position: 'absolute', inset: 0, zIndex: 3,
@@ -196,7 +203,7 @@ export default function SandboxHero() {
         }}
       />
 
-      {/* ── L4: Ripple animation — centered on animation center ────────── */}
+      {/* ── L4: Ripple — centered on animation center ─────────────────── */}
       <div
         style={{
           position: 'absolute', left: '50%', top: ANIM_CENTER_TOP,
@@ -206,34 +213,43 @@ export default function SandboxHero() {
         <Ripple />
       </div>
 
-      {/* ── L5: Section blur — dark panel from event horizon downward ─── */}
+      {/* ── L5: Section blur — top edge bisects the logo at ANIM_CENTER_TOP.
+           Gradient goes from fully transparent → 100% opaque #0F0F11.    */}
       <div
         style={{
-          position: 'absolute', left: 0, right: 0,
-          top: '50%', bottom: 0, zIndex: 5,
-          background: 'linear-gradient(to bottom, transparent 0%, rgba(15,15,17,0.55) 18%, rgba(15,15,17,0.90) 42%, #0F0F11 68%)',
-          backdropFilter: 'blur(8px)',
+          position:   'absolute',
+          left:        0,
+          right:       0,
+          top:         ANIM_CENTER_TOP,
+          bottom:      0,
+          zIndex:      5,
+          background:  'linear-gradient(to bottom, transparent 0%, rgba(15,15,17,0.28) 12%, rgba(15,15,17,0.58) 28%, rgba(15,15,17,0.85) 50%, #0F0F11 72%, #0F0F11 100%)',
+          backdropFilter:       'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
           pointerEvents: 'none',
         }}
       />
 
-      {/* ── L6: le-node logo — above section blur ─────────────────────── */}
+      {/* ── L6: le-node logo — centered on ANIM_CENTER_TOP so the section
+           blur's top edge bisects it exactly at its vertical midpoint.   */}
       <div
         style={{
-          position: 'absolute', left: '50%', top: '65%',
-          transform: 'translate(-50%, -50%)', zIndex: 6,
+          position:  'absolute',
+          left:       '50%',
+          top:        ANIM_CENTER_TOP,
+          transform: 'translate(-50%, -50%)',
+          zIndex:     6,
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/logo.png"
+          src="/logos/lenode-badge.png"
           alt="le node"
-          width={120}
-          height={74}
+          width={140}
+          height={86}
           draggable={false}
           style={{
-            display: 'block', borderRadius: 16,
+            display: 'block', borderRadius: 18,
             boxShadow: '0 0 36px rgba(0,67,250,0.40), 0 0 80px rgba(0,67,250,0.18)',
           }}
         />
@@ -277,11 +293,11 @@ export default function SandboxHero() {
           </span>
         </div>
 
-        {/* H1 */}
+        {/* H1 — 40px on desktop */}
         <h1
           style={{
             fontFamily: 'var(--font-nanum)', fontWeight: 800,
-            fontSize: '30px', lineHeight: 1.2,
+            fontSize: '40px', lineHeight: 1.15,
             color: '#F0F2FF', margin: 0, marginBottom: '0.4rem',
           }}
         >

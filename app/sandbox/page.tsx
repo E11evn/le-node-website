@@ -13,5 +13,11 @@ export const metadata: Metadata = {
 }
 
 export default function SandboxPage() {
-  return <SandboxHero />
+  return (
+    <>
+      <SandboxHero />
+      {/* Empty section — allows scrolling down from the hero */}
+      <div style={{ height: '100vh', background: '#0F0F11' }} />
+    </>
+  )
 }
