@@ -29,10 +29,10 @@ All live at the top of the fragment shader (`frag` string in `BlackHole.tsx`):
 
 ```glsl
 #define STEPS    96     // quality — lower is faster (try 48 for mobile)
-#define DS       0.009  // step size — smaller = more detail, more expensive
-#define GRAV     0.28   // gravity — higher bends light more dramatically
+#define DS       0.018  // step size — DS × STEPS must exceed camera distance
+#define GRAV     0.22   // gravity — higher bends light more dramatically
 #define HORIZON  0.15   // radius of the black sphere (event horizon)
-#define DISK_H   0.04   // disk half-thickness (try 0.08 for a fatter disk)
+#define DISK_H   0.05   // disk half-thickness (try 0.10 for a fatter disk)
 #define EMIT     3.5    // disk brightness multiplier
 ```
 

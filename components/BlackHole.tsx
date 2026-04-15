@@ -69,11 +69,12 @@ float fbm(vec2 p) {
 mat2 rot2(float a) { float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
 // ── Constants — edit these to tweak the look ─────────────────────────────────
+// DS × STEPS must exceed camera distance (~1.35).  96 × 0.018 = 1.73 ✓
 #define STEPS    96       // ray-march iterations (lower = faster, less detail)
-#define DS       0.009    // step size in world units
-#define GRAV     0.28     // gravitational bend strength
+#define DS       0.018    // step size in world units
+#define GRAV     0.22     // gravitational bend strength
 #define HORIZON  0.15     // event horizon radius (black sphere size)
-#define DISK_H   0.04     // disk half-thickness
+#define DISK_H   0.05     // disk half-thickness
 #define EMIT     3.5      // emission multiplier (disk brightness)
 
 void main() {
@@ -84,7 +85,8 @@ void main() {
   // ── Perspective camera ───────────────────────────────────────────────────
   // Positioned slightly above the equatorial plane so the disk reads as an
   // ellipse — the classic Interstellar viewing angle.
-  vec3 ro = vec3(0.0, 0.50, 2.4);
+  // Distance to origin ~1.35; total march = DS × STEPS = 1.73 > 1.35 ✓
+  vec3 ro = vec3(0.0, 0.35, 1.3);
   vec3 fw = normalize(-ro);                              // look at origin
   vec3 ri = normalize(cross(fw, vec3(0.0, 1.0, 0.0)));
   vec3 up = cross(ri, fw);
@@ -107,7 +109,7 @@ void main() {
     rp += rd * DS;
     dist = length(rp);
 
-    if (dist > 2.8) continue;   // ray escaped — skip
+    if (dist > 2.2) continue;   // ray escaped — skip
 
     // ── Accretion disk (lies in the XZ plane, Y ≈ 0) ──────────────────────
     float radial = length(rp.xz);
