@@ -2,33 +2,32 @@
 
 // ─── Tool rings — 3 orbits, 4 icons each ─────────────────────────────────
 const INNER_RING = [
-  { id: 'google',      logoSize: 30 },
-  { id: 'notion',      logoSize: 30 },
-  { id: 'claude',      logoSize: 30 },
-  { id: 'webhook',     logoSize: 30 },
+  { id: 'google',      logoSize: 21 },
+  { id: 'notion',      logoSize: 21 },
+  { id: 'claude',      logoSize: 21 },
+  { id: 'webhook',     logoSize: 21 },
 ]
 const MIDDLE_RING = [
-  { id: 'linkedin',    logoSize: 30 },
-  { id: 'slack',       logoSize: 30 },
-  { id: 'apollo',      logoSize: 30 },
-  { id: 'dropcontact', logoSize: 30 },
+  { id: 'linkedin',    logoSize: 21 },
+  { id: 'slack',       logoSize: 21 },
+  { id: 'apollo',      logoSize: 21 },
+  { id: 'dropcontact', logoSize: 21 },
 ]
 const OUTER_RING = [
-  { id: 'clay',        logoSize: 24 },
-  { id: 'salesforce',  logoSize: 30 },
-  { id: 'hubspot',     logoSize: 30 },
-  { id: 'pipedrive',   logoSize: 30 },
+  { id: 'clay',        logoSize: 17 },
+  { id: 'salesforce',  logoSize: 21 },
+  { id: 'hubspot',     logoSize: 21 },
+  { id: 'pipedrive',   logoSize: 21 },
 ]
 
 // All layers keyed off one constant — change here to move everything together
 const ANIM_CENTER_TOP = '62%'
 
-// ─── Ripple — twice smaller than the original ─────────────────────────────
-// Direct children of a 0×0 container; keyframe translate(-50%,-50%) centers.
+// ─── Ripple — 50% larger than the "twice smaller" revision ───────────────
 function Ripple() {
   const NUM   = 7
-  const START = 55   // was 110
-  const STEP  = 29   // was 58
+  const START = 83   // 55 × 1.5
+  const STEP  = 44   // 29 × 1.5
 
   return (
     <>
@@ -99,17 +98,19 @@ function OrbitRing({
                 transform:            'translate(-50%, -50%)',
                 animation:            `${counterAnim} ${duration}s linear infinite`,
                 animationDelay:       `${delay}s`,
-                width:                 42,
-                height:                42,
+                // Box: 30% smaller than 42px = 29px → 30px
+                width:                 30,
+                height:                30,
+                opacity:               0.8,          // 20% less visible
                 background:           'rgba(240, 242, 255, 0.06)',
                 border:               '1px solid rgba(240, 242, 255, 0.12)',
-                borderRadius:          10,
+                borderRadius:          7,
                 backdropFilter:       'blur(6px)',
                 WebkitBackdropFilter: 'blur(6px)',
                 display:              'flex',
                 alignItems:           'center',
                 justifyContent:       'center',
-                boxShadow:            '0 2px 10px rgba(0,0,0,0.4)',
+                // no boxShadow
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -119,7 +120,7 @@ function OrbitRing({
                 width={tool.logoSize}
                 height={tool.logoSize}
                 draggable={false}
-                style={{ display: 'block', borderRadius: 3 }}
+                style={{ display: 'block', borderRadius: 2 }}
               />
             </div>
           </div>
@@ -154,30 +155,23 @@ export default function SandboxHero() {
         .sb-email:focus { outline: none; border-color: rgba(0,67,250,0.5); }
       `}</style>
 
-      {/* ── L0: Black hole video — taller than viewport so the visual
-           center of the black hole aligns with ANIM_CENTER_TOP.
-           height: 124% → black hole (at 50% of video) appears at
-           50% × 124% = 62% from top of viewport.               ──── */}
+      {/* ── L0: Black hole video — height 124% aligns black hole at 62% ── */}
       <video
         autoPlay muted loop playsInline
         src="/nodesingularity.webm"
         style={{
-          position:   'absolute',
-          top:         0,
-          left:        0,
-          width:       '100%',
-          height:      '124%',
-          objectFit:  'cover',
-          objectPosition: 'center center',
-          zIndex:      0,
+          position: 'absolute', top: 0, left: 0,
+          width: '100%', height: '124%',
+          objectFit: 'cover', objectPosition: 'center center',
+          zIndex: 0,
         }}
       />
 
-      {/* ── L1: Layer dark — 30% less opaque than before (was 0.60) ───── */}
+      {/* ── L1: Hero layer blur — rgba 0.42 reduced 20% → 0.34 ──────── */}
       <div
         style={{
           position: 'absolute', inset: 0, zIndex: 1,
-          background: 'rgba(15,15,17,0.42)',
+          background: 'rgba(15,15,17,0.34)',
           pointerEvents: 'none',
         }}
       />
@@ -194,7 +188,7 @@ export default function SandboxHero() {
         <OrbitRing tools={OUTER_RING}  radius={248} duration={102} reverse={false} />
       </div>
 
-      {/* ── L3: Dark gradient tools — radial vignette, center = anim center */}
+      {/* ── L3: Dark gradient tools — radial vignette ─────────────────── */}
       <div
         style={{
           position: 'absolute', inset: 0, zIndex: 3,
@@ -213,32 +207,23 @@ export default function SandboxHero() {
         <Ripple />
       </div>
 
-      {/* ── L5: Section blur — top edge bisects the logo at ANIM_CENTER_TOP.
-           Gradient goes from fully transparent → 100% opaque #0F0F11.    */}
+      {/* ── L5: Section blur — transparent → #0F0F11, top bisects logo ── */}
       <div
         style={{
-          position:   'absolute',
-          left:        0,
-          right:       0,
-          top:         ANIM_CENTER_TOP,
-          bottom:      0,
-          zIndex:      5,
-          background:  'linear-gradient(to bottom, transparent 0%, rgba(15,15,17,0.28) 12%, rgba(15,15,17,0.58) 28%, rgba(15,15,17,0.85) 50%, #0F0F11 72%, #0F0F11 100%)',
+          position: 'absolute', left: 0, right: 0,
+          top: ANIM_CENTER_TOP, bottom: 0, zIndex: 5,
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(15,15,17,0.28) 12%, rgba(15,15,17,0.58) 28%, rgba(15,15,17,0.85) 50%, #0F0F11 72%, #0F0F11 100%)',
           backdropFilter:       'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
           pointerEvents: 'none',
         }}
       />
 
-      {/* ── L6: le-node logo — centered on ANIM_CENTER_TOP so the section
-           blur's top edge bisects it exactly at its vertical midpoint.   */}
+      {/* ── L6: le-node logo — section blur top edge bisects it ─────────── */}
       <div
         style={{
-          position:  'absolute',
-          left:       '50%',
-          top:        ANIM_CENTER_TOP,
-          transform: 'translate(-50%, -50%)',
-          zIndex:     6,
+          position: 'absolute', left: '50%', top: ANIM_CENTER_TOP,
+          transform: 'translate(-50%, -50%)', zIndex: 6,
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -255,12 +240,12 @@ export default function SandboxHero() {
         />
       </div>
 
-      {/* ── L50: Content — tag → H1 → tagline → CTAs ─────────────────── */}
+      {/* ── L50: Content — tag → H1 → tagline → CTAs (~50px between each) */}
       <div
         style={{
           position: 'absolute', inset: 0, zIndex: 50,
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          textAlign: 'center', paddingTop: '4.5rem',
+          textAlign: 'center', paddingTop: '5rem',
           paddingLeft: '1.5rem', paddingRight: '1.5rem',
           pointerEvents: 'none',
         }}
@@ -272,7 +257,7 @@ export default function SandboxHero() {
             padding: '0.35rem 1rem', borderRadius: 999,
             background: 'rgba(34,34,34,0.88)',
             border: '1px solid rgba(255,255,255,0.10)',
-            marginBottom: '1.25rem', pointerEvents: 'auto',
+            marginBottom: '50px', pointerEvents: 'auto',
           }}
         >
           <span
@@ -293,12 +278,12 @@ export default function SandboxHero() {
           </span>
         </div>
 
-        {/* H1 — 40px on desktop */}
+        {/* H1 */}
         <h1
           style={{
             fontFamily: 'var(--font-nanum)', fontWeight: 800,
             fontSize: '40px', lineHeight: 1.15,
-            color: '#F0F2FF', margin: 0, marginBottom: '0.4rem',
+            color: '#F0F2FF', margin: 0, marginBottom: '50px',
           }}
         >
           Your entire GTM Motion
@@ -311,7 +296,7 @@ export default function SandboxHero() {
           style={{
             fontFamily: 'var(--font-open-sans)', fontSize: '0.875rem',
             lineHeight: 1.7, color: 'rgba(240,242,255,0.52)',
-            maxWidth: '32rem', margin: '1rem 0 0',
+            maxWidth: '32rem', margin: '0 0 50px',
           }}
         >
           le node orchestrates the{' '}
@@ -331,7 +316,7 @@ export default function SandboxHero() {
         <div
           style={{
             display: 'flex', alignItems: 'center', gap: '0.6rem',
-            marginTop: '1.75rem', pointerEvents: 'auto',
+            pointerEvents: 'auto',
           }}
         >
           <input
