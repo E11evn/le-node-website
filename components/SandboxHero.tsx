@@ -134,10 +134,17 @@ function OrbitRing({
 
 // ─── Hero ─────────────────────────────────────────────────────────────────
 export default function SandboxHero() {
-  const containerRef  = useRef<HTMLDivElement>(null)
+  const containerRef   = useRef<HTMLDivElement>(null)
   const [scrollProgress, setScrollProgress] = useState(0)
-  const linesActivated = useRef(false)
-  const [linesActive, setLinesActive] = useState(false)
+  const [linesActive,   setLinesActive]   = useState(false)
+  const [windowHeight,  setWindowHeight]  = useState(900)
+
+  useEffect(() => {
+    setWindowHeight(window.innerHeight)
+    const onResize = () => setWindowHeight(window.innerHeight)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   useEffect(() => {
     let rafId: number
@@ -151,11 +158,8 @@ export default function SandboxHero() {
         const total = el.offsetHeight - window.innerHeight
         const progress = Math.max(0, Math.min(1, scrolled / total))
         setScrollProgress(progress)
-
-        if (progress >= 0.47 && !linesActivated.current) {
-          linesActivated.current = true
-          setLinesActive(true)
-        }
+        // Reactive (not one-shot) — so lines disappear when scrolling back up
+        setLinesActive(progress >= 0.28)
       })
     }
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -165,18 +169,21 @@ export default function SandboxHero() {
     }
   }, [])
 
-  // ── Derived animation values ──────────────────────────────────────────
-  const contentOpacity       = 1 - lerp(scrollProgress, 0.20, 0.42)
-  const orbitOpacity         = 1 - lerp(scrollProgress, 0.25, 0.48)
-  const labelFadeIn          = lerp(scrollProgress, 0.36, 0.50)
-  const labelFadeOut         = 1 - lerp(scrollProgress, 0.68, 0.82)
-  const labelOpacity         = labelFadeIn * labelFadeOut
-  const exitGroupOpacity     = 1 - lerp(scrollProgress, 0.68, 0.84)
-  const nextSectionOpacity   = lerp(scrollProgress, 0.75, 0.92)
+  // ── Derived animation values (all start near scroll=0) ───────────────
+  const contentOpacity     = 1 - lerp(scrollProgress, 0.01, 0.28)
+  const orbitOpacity       = 1 - lerp(scrollProgress, 0.05, 0.35)
+  const labelFadeIn        = lerp(scrollProgress, 0.24, 0.40)
+  const labelFadeOut       = 1 - lerp(scrollProgress, 0.65, 0.80)
+  const labelOpacity       = labelFadeIn * labelFadeOut
+  const exitGroupOpacity   = 1 - lerp(scrollProgress, 0.65, 0.82)
+  const nextSectionOpacity = lerp(scrollProgress, 0.72, 0.92)
 
-  // Badge/orbital center: starts at 88 % (bottom), moves to 50 % (screen center)
-  const animCenterTopPct = 88 - lerp(scrollProgress, 0.25, 0.50) * 38
+  // Badge/orbital center: starts at 77 % (~100 px higher), moves to 50 %
+  const animCenterTopPct = 77 - lerp(scrollProgress, 0.01, 0.40) * 27
   const animCenterTop    = `${animCenterTopPct}%`
+
+  // Video parallax: shift top so black-hole center tracks the badge
+  const videoTop = -((0.90 - animCenterTopPct / 100) * windowHeight)
 
   return (
     // ── Outer scroll container (600 vh gives 500 vh of scroll range) ──
@@ -211,7 +218,7 @@ export default function SandboxHero() {
           autoPlay muted loop playsInline
           src="/nodesingularity.webm"
           style={{
-            position: 'absolute', top: 0, left: 0,
+            position: 'absolute', top: videoTop, left: 0,
             width: '100%', height: '180%',
             objectFit: 'cover', objectPosition: 'center center',
             zIndex: 0,
@@ -304,7 +311,7 @@ export default function SandboxHero() {
           background: 'rgba(240,242,255,0.5)',
           zIndex: 47, pointerEvents: 'none',
           opacity: exitGroupOpacity,
-          transition: linesActive ? 'transform 0.8s ease' : 'none',
+          transition: 'transform 0.8s ease',
         }} />
         {/* Line 2: badge bottom → your company */}
         <div style={{
@@ -316,7 +323,7 @@ export default function SandboxHero() {
           background: 'rgba(240,242,255,0.5)',
           zIndex: 47, pointerEvents: 'none',
           opacity: exitGroupOpacity,
-          transition: linesActive ? 'transform 0.8s ease 0.8s' : 'none',
+          transition: linesActive ? 'transform 0.8s ease 0.8s' : 'transform 0.5s ease',
         }} />
 
         {/* ── L48: "your market" / "your company" labels ────────────────── */}
