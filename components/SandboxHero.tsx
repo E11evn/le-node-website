@@ -159,16 +159,16 @@ function ParticleCanvas({ centerTopPctRef }: { centerTopPctRef: React.RefObject<
     resize()
     window.addEventListener('resize', resize)
 
-    // Spawn a fresh particle at a random outer radius
+    // Spawn a fresh particle at a random outer radius (screen-edge distances)
     const spawn = (): Particle => {
-      const r = 160 + Math.random() * 240
+      const r = 450 + Math.random() * 250
       return {
         angle:     Math.random() * Math.PI * 2,
         radius:    r,
         maxRadius: r,
-        speed:     0.18 + Math.random() * 0.42,
-        rotSpeed:  (Math.random() > 0.5 ? 1 : -1) * (0.002 + Math.random() * 0.005),
-        size:      0.7 + Math.random() * 1.6,
+        speed:     0.04 + Math.random() * 0.10,
+        rotSpeed:  (Math.random() > 0.5 ? 1 : -1) * (0.0005 + Math.random() * 0.001),
+        size:      0.4 + Math.random() * 0.9,
         opacity:   0,
         blue:      Math.random() > 0.65,
       }
@@ -177,8 +177,8 @@ function ParticleCanvas({ centerTopPctRef }: { centerTopPctRef: React.RefObject<
     const N = 90
     const particles: Particle[] = Array.from({ length: N }, () => {
       const p = spawn()
-      // Stagger initial radii so they don't all start at the edge
-      p.radius    = 10 + Math.random() * p.maxRadius
+      // Stagger initial radii within the valid range (400 → maxRadius)
+      p.radius    = 400 + Math.random() * (p.maxRadius - 400)
       p.opacity   = 0
       return p
     })
@@ -201,7 +201,7 @@ function ParticleCanvas({ centerTopPctRef }: { centerTopPctRef: React.RefObject<
         p.radius -= p.speed * dt
         p.angle  += p.rotSpeed * dt
 
-        if (p.radius < 8) {
+        if (p.radius < 400) {
           const fresh  = spawn()
           Object.assign(p, fresh)
           continue
@@ -210,12 +210,12 @@ function ParticleCanvas({ centerTopPctRef }: { centerTopPctRef: React.RefObject<
         const x = cx + Math.cos(p.angle) * p.radius
         const y = cy + Math.sin(p.angle) * p.radius
 
-        // Opacity: fade in from edge, fade out near center
+        // Opacity: fade in from outer edge, fade out as radius approaches 400
         const ratio = p.radius / p.maxRadius
-        const target = ratio > 0.88
-          ? (1 - ratio) / 0.12 * 0.65
-          : ratio < 0.18
-          ? (ratio / 0.18) * 0.65
+        const target = ratio > 0.90
+          ? (1 - ratio) / 0.10 * 0.65
+          : p.radius < 500
+          ? ((p.radius - 400) / 100) * 0.65
           : 0.65
         p.opacity += (target - p.opacity) * 0.08 * dt
         if (p.opacity < 0.01) continue
@@ -615,24 +615,74 @@ export default function SandboxHero() {
             display: 'flex', flexDirection: 'column',
             justifyContent: 'flex-end', paddingBottom: '8rem',
             opacity: nextSectionOpacity,
-            pointerEvents: 'none',
+            pointerEvents: nextSectionOpacity > 0.5 ? 'auto' : 'none',
             background: 'linear-gradient(to top, rgba(15,15,17,0.95) 30%, transparent 100%)',
           }}
         >
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
+            {/* Logo strip */}
             <p style={{
-              fontFamily: 'var(--font-open-sans)', fontSize: '0.75rem',
-              letterSpacing: '0.12em', textTransform: 'uppercase',
-              color: 'rgba(240,242,255,0.35)', marginBottom: '0.75rem',
+              fontFamily: 'var(--font-open-sans)', fontSize: '0.6875rem',
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+              color: 'rgba(240,242,255,0.28)', marginBottom: '1.5rem',
             }}>
-              How it works
+              Trusted by revenue teams
             </p>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              gap: '2rem', flexWrap: 'wrap', marginBottom: '3rem',
+            }}>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} style={{
+                  width: 72, height: 16,
+                  background: 'rgba(240,242,255,0.10)',
+                  borderRadius: 4,
+                }} />
+              ))}
+            </div>
+            {/* CTA */}
             <h2 style={{
               fontFamily: 'var(--font-nanum)', fontWeight: 800,
-              fontSize: '2.25rem', color: '#F0F2FF', margin: 0,
+              fontSize: '2rem', color: '#F0F2FF', margin: '0 0 0.75rem',
             }}>
-              Battle tested methodology
+              Put your GTM motion{' '}
+              <span style={{ color: '#0043FA' }}>on autopilot</span>
             </h2>
+            <p style={{
+              fontFamily: 'var(--font-open-sans)', fontSize: '0.875rem',
+              lineHeight: 1.65, color: 'rgba(240,242,255,0.42)',
+              margin: '0 auto 1.75rem', maxWidth: '28rem',
+            }}>
+              Join the waitlist and be the first to connect your stack,<br />
+              map your market, and close on autopilot.
+            </p>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              gap: '0.6rem', flexWrap: 'wrap',
+            }}>
+              <input
+                type="email"
+                placeholder="your@email.com"
+                style={{
+                  height: 48, padding: '0 1rem', borderRadius: 9,
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(0,0,0,0.10)',
+                  color: '#222222', fontSize: '0.875rem',
+                  fontFamily: 'var(--font-open-sans)',
+                  width: 220,
+                }}
+              />
+              <button style={{
+                height: 48, padding: '0 1.4rem', borderRadius: 9,
+                background: '#0043FA', border: 'none',
+                color: '#F0F2FF', fontSize: '0.875rem',
+                fontFamily: 'var(--font-open-sans)', fontWeight: 600,
+                cursor: 'pointer', letterSpacing: '0.01em',
+                whiteSpace: 'nowrap',
+              }}>
+                Join waitlist
+              </button>
+            </div>
           </div>
         </div>
 

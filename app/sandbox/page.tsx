@@ -33,7 +33,7 @@ export default function SandboxPage() {
             textTransform: 'uppercase', color: 'rgba(0,67,250,0.7)',
             marginBottom: '1.25rem',
           }}>
-            Methodology
+            How it works
           </p>
           <h2 style={{
             fontFamily: 'var(--font-nanum, serif)',

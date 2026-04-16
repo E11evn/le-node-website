@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plug, Map, Filter, LayoutList, Zap, LucideIcon } from 'lucide-react'
+import { Users, Target, MessageSquare, RefreshCw, TrendingUp, LucideIcon } from 'lucide-react'
 
 export interface WheelStep {
   title: string
@@ -12,29 +12,29 @@ export interface WheelStep {
 
 const DEFAULT_STEPS: WheelStep[] = [
   {
-    title: 'Connect your stack',
-    description: 'Plug in your CRM, sequencer, enrichment tools, and data sources in minutes — no eng required.',
-    icon: Plug,
-  },
-  {
-    title: 'Map your market',
-    description: 'Define ICPs, build segment criteria, and let le-node surface the right accounts automatically.',
-    icon: Map,
+    title: 'Learn your ICP',
+    description: 'le node connects to your existing business data to learn who your ICP is.',
+    icon: Users,
   },
   {
     title: 'Qualify signals',
-    description: 'Surface intent data and buying signals so your team prioritises accounts most likely to convert.',
-    icon: Filter,
+    description: 'le node detects intent signals, qualifies and scores prospects based on your ICP.',
+    icon: Target,
   },
   {
-    title: 'Build sequences',
-    description: 'AI-generated multi-touch sequences tailored to each segment — reviewed by you, deployed instantly.',
-    icon: LayoutList,
+    title: 'Engage leads',
+    description: "le node finds your leads' contact info to engage them in relevant conversations and generate opportunity, on autopilot.",
+    icon: MessageSquare,
   },
   {
-    title: 'Close on autopilot',
-    description: 'Automated follow-ups, handoffs, and reporting so your team focuses on closing, not chasing.',
-    icon: Zap,
+    title: 'Sync your stack',
+    description: 'Then syncs back to your stack to maintain your CRM up to date, and hands over the opportunities where your team already works.',
+    icon: RefreshCw,
+  },
+  {
+    title: 'Track & learn',
+    description: 'Track performance. le node continuously learns from results to enhance your outbound approach.',
+    icon: TrendingUp,
   },
 ]
 
@@ -203,46 +203,6 @@ export default function CircularWheelStepper({
           </AnimatePresence>
         </div>
 
-      </div>
-
-      {/* ── Navigation ────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: '0.6rem' }}>
-        <button
-          onClick={() => setActive(Math.max(0, active - 1))}
-          disabled={active === 0}
-          style={{
-            height:     40,
-            padding:    '0 1.25rem',
-            borderRadius: 9,
-            background: 'transparent',
-            border:     '1px solid rgba(240,242,255,0.12)',
-            color:      active === 0 ? 'rgba(240,242,255,0.18)' : 'rgba(240,242,255,0.55)',
-            fontFamily: 'var(--font-open-sans, sans-serif)',
-            fontSize:   '0.875rem',
-            cursor:     active === 0 ? 'not-allowed' : 'pointer',
-          }}
-        >
-          Back
-        </button>
-        <button
-          onClick={() => setActive(Math.min(total - 1, active + 1))}
-          disabled={active === total - 1}
-          style={{
-            height:     40,
-            padding:    '0 1.25rem',
-            borderRadius: 9,
-            background: active === total - 1 ? 'rgba(0,67,250,0.25)' : '#0043FA',
-            border:     'none',
-            color:      active === total - 1 ? 'rgba(240,242,255,0.35)' : '#F0F2FF',
-            fontFamily: 'var(--font-open-sans, sans-serif)',
-            fontSize:   '0.875rem',
-            fontWeight:  600,
-            cursor:     active === total - 1 ? 'not-allowed' : 'pointer',
-            letterSpacing: '0.01em',
-          }}
-        >
-          Next
-        </button>
       </div>
 
     </div>
