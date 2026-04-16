@@ -18,8 +18,6 @@ export default function SandboxPage() {
     <>
       <Nav />
       <SandboxHero />
-      {/* Empty section — allows scrolling down from the hero */}
-      <div style={{ height: '100vh', background: '#0F0F11' }} />
     </>
   )
 }

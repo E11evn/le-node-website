@@ -8,7 +8,7 @@ export default function Nav() {
   const isAgency = pathname.startsWith('/agence') || pathname === '/book'
 
   return (
-    <header className="sticky top-0 z-50 bg-[#212226] border-b border-white/10">
+    <header className="sticky top-0 z-[200] bg-[#212226] border-b border-white/10">
       <nav className="container-content flex items-center justify-between h-16">
 
         {/* Left: Logo */}
