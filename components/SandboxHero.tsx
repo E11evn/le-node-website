@@ -132,9 +132,134 @@ function OrbitRing({
   )
 }
 
+// ─── Particle canvas ─────────────────────────────────────────────────────
+interface Particle {
+  angle:       number
+  radius:      number
+  maxRadius:   number
+  speed:       number   // px/frame inward
+  rotSpeed:    number   // rad/frame angular
+  size:        number
+  opacity:     number
+  blue:        boolean
+}
+
+function ParticleCanvas({ centerTopPctRef }: { centerTopPctRef: React.RefObject<number> }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')!
+
+    const resize = () => {
+      canvas.width  = canvas.offsetWidth
+      canvas.height = canvas.offsetHeight
+    }
+    resize()
+    window.addEventListener('resize', resize)
+
+    // Spawn a fresh particle at a random outer radius
+    const spawn = (): Particle => {
+      const r = 160 + Math.random() * 240
+      return {
+        angle:     Math.random() * Math.PI * 2,
+        radius:    r,
+        maxRadius: r,
+        speed:     0.18 + Math.random() * 0.42,
+        rotSpeed:  (Math.random() > 0.5 ? 1 : -1) * (0.002 + Math.random() * 0.005),
+        size:      0.7 + Math.random() * 1.6,
+        opacity:   0,
+        blue:      Math.random() > 0.65,
+      }
+    }
+
+    const N = 90
+    const particles: Particle[] = Array.from({ length: N }, () => {
+      const p = spawn()
+      // Stagger initial radii so they don't all start at the edge
+      p.radius    = 10 + Math.random() * p.maxRadius
+      p.opacity   = 0
+      return p
+    })
+
+    let rafId: number
+    let last = 0
+
+    const draw = (now: number) => {
+      const dt = Math.min((now - last) / 16, 3)
+      last = now
+
+      const w  = canvas.width
+      const h  = canvas.height
+      const cx = w * 0.5
+      const cy = h * (centerTopPctRef.current ?? 77) / 100
+
+      ctx.clearRect(0, 0, w, h)
+
+      for (const p of particles) {
+        p.radius -= p.speed * dt
+        p.angle  += p.rotSpeed * dt
+
+        if (p.radius < 8) {
+          const fresh  = spawn()
+          Object.assign(p, fresh)
+          continue
+        }
+
+        const x = cx + Math.cos(p.angle) * p.radius
+        const y = cy + Math.sin(p.angle) * p.radius
+
+        // Opacity: fade in from edge, fade out near center
+        const ratio = p.radius / p.maxRadius
+        const target = ratio > 0.88
+          ? (1 - ratio) / 0.12 * 0.65
+          : ratio < 0.18
+          ? (ratio / 0.18) * 0.65
+          : 0.65
+        p.opacity += (target - p.opacity) * 0.08 * dt
+        if (p.opacity < 0.01) continue
+
+        ctx.save()
+        ctx.shadowBlur  = 3
+        ctx.shadowColor = p.blue
+          ? 'rgba(100,160,255,0.55)'
+          : 'rgba(255,255,255,0.35)'
+        ctx.beginPath()
+        ctx.arc(x, y, p.size, 0, Math.PI * 2)
+        ctx.fillStyle = p.blue
+          ? `rgba(170,200,255,${p.opacity})`
+          : `rgba(255,255,255,${p.opacity})`
+        ctx.fill()
+        ctx.restore()
+      }
+
+      rafId = requestAnimationFrame(draw)
+    }
+
+    rafId = requestAnimationFrame(draw)
+    return () => {
+      cancelAnimationFrame(rafId)
+      window.removeEventListener('resize', resize)
+    }
+  }, [centerTopPctRef])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'absolute', inset: 0,
+        width: '100%', height: '100%',
+        zIndex: 3, pointerEvents: 'none',
+      }}
+    />
+  )
+}
+
 // ─── Hero ─────────────────────────────────────────────────────────────────
 export default function SandboxHero() {
-  const containerRef   = useRef<HTMLDivElement>(null)
+  const containerRef      = useRef<HTMLDivElement>(null)
+  const centerTopPctRef   = useRef<number>(77)          // kept in sync for canvas loop
   const [scrollProgress, setScrollProgress] = useState(0)
   const [linesActive,   setLinesActive]   = useState(false)
   const [windowHeight,  setWindowHeight]  = useState(900)
@@ -171,17 +296,18 @@ export default function SandboxHero() {
 
   // ── Derived animation values (all start near scroll=0) ───────────────
   const contentOpacity     = 1 - lerp(scrollProgress, 0.01, 0.28)
-  const orbitOpacity       = 1 - lerp(scrollProgress, 0.05, 0.35)
+  const orbitOpacity       = 1  // tools always visible
   const labelFadeIn        = lerp(scrollProgress, 0.24, 0.40)
   const labelFadeOut       = 1 - lerp(scrollProgress, 0.65, 0.80)
   const labelOpacity       = labelFadeIn * labelFadeOut
   const exitGroupOpacity   = 1 - lerp(scrollProgress, 0.65, 0.82)
-  const darkMaskOpacity    = lerp(scrollProgress, 0.60, 0.88)
+  const darkMaskOpacity    = lerp(scrollProgress, 0.60, 0.74)  // 2× faster
   const nextSectionOpacity = lerp(scrollProgress, 0.72, 0.92)
 
   // Badge/orbital center: starts at 77 % (~100 px higher), moves to 50 %
   const animCenterTopPct = 77 - lerp(scrollProgress, 0.01, 0.40) * 27
   const animCenterTop    = `${animCenterTopPct}%`
+  centerTopPctRef.current = animCenterTopPct  // keep canvas in sync (no re-render)
 
   // Video parallax: shift top so black-hole center tracks the badge
   const videoTop = -((0.90 - animCenterTopPct / 100) * windowHeight)
@@ -234,6 +360,9 @@ export default function SandboxHero() {
             pointerEvents: 'none',
           }}
         />
+
+        {/* ── L1.5: Particle canvas ─────────────────────────────────────── */}
+        <ParticleCanvas centerTopPctRef={centerTopPctRef} />
 
         {/* ── L2: Orbiting tool icons — three rings ─────────────────────── */}
         <div
@@ -502,28 +631,11 @@ export default function SandboxHero() {
               fontFamily: 'var(--font-nanum)', fontWeight: 800,
               fontSize: '2.25rem', color: '#F0F2FF', margin: 0,
             }}>
-              Placeholder next section
+              Battle tested methodology
             </h2>
           </div>
         </div>
 
-        {/* ── L60: Bottom label ─────────────────────────────────────────── */}
-        <div
-          style={{
-            position: 'absolute', bottom: '1.5rem', left: 0, right: 0,
-            textAlign: 'center', zIndex: 60, pointerEvents: 'none',
-            opacity: contentOpacity,
-          }}
-        >
-          <span
-            style={{
-              fontFamily: 'var(--font-nanum)', fontSize: '1rem',
-              color: 'rgba(240,242,255,0.20)', letterSpacing: '0.06em',
-            }}
-          >
-            Connect &nbsp;&nbsp; your market &nbsp;&nbsp; your company
-          </span>
-        </div>
 
       </div>
     </div>

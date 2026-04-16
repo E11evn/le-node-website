@@ -7,6 +7,7 @@
 import type { Metadata } from 'next'
 import Nav from '@/components/Nav'
 import SandboxHero from '@/components/SandboxHero'
+import CircularWheelStepper from '@/components/CircularWheelStepper'
 
 export const metadata: Metadata = {
   title: 'Sandbox — le-node',
@@ -18,6 +19,32 @@ export default function SandboxPage() {
     <>
       <Nav />
       <SandboxHero />
+
+      {/* ── Battle tested methodology ──────────────────────────────────── */}
+      <div style={{
+        background: '#0F0F11',
+        borderTop: '1px solid rgba(240,242,255,0.07)',
+        padding: '7rem 1.5rem',
+      }}>
+        <div style={{ maxWidth: '56rem', margin: '0 auto', textAlign: 'center' }}>
+          <p style={{
+            fontFamily: 'var(--font-open-sans, sans-serif)',
+            fontSize: '0.6875rem', letterSpacing: '0.14em',
+            textTransform: 'uppercase', color: 'rgba(0,67,250,0.7)',
+            marginBottom: '1.25rem',
+          }}>
+            Methodology
+          </p>
+          <h2 style={{
+            fontFamily: 'var(--font-nanum, serif)',
+            fontWeight: 800, fontSize: '2.25rem', lineHeight: 1.2,
+            color: '#F0F2FF', marginBottom: '3.5rem',
+          }}>
+            Battle tested methodology
+          </h2>
+          <CircularWheelStepper />
+        </div>
+      </div>
 
       {/* ── Social proof strip ─────────────────────────────────────────── */}
       <div style={{
