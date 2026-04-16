@@ -177,8 +177,8 @@ function ParticleCanvas({ centerTopPctRef }: { centerTopPctRef: React.RefObject<
     const N = 90
     const particles: Particle[] = Array.from({ length: N }, () => {
       const p = spawn()
-      // Stagger initial radii within the valid range (400 → maxRadius)
-      p.radius    = 400 + Math.random() * (p.maxRadius - 400)
+      // Stagger initial radii within the valid range (320 → maxRadius)
+      p.radius    = 320 + Math.random() * (p.maxRadius - 320)
       p.opacity   = 0
       return p
     })
@@ -201,7 +201,7 @@ function ParticleCanvas({ centerTopPctRef }: { centerTopPctRef: React.RefObject<
         p.radius -= p.speed * dt
         p.angle  += p.rotSpeed * dt
 
-        if (p.radius < 400) {
+        if (p.radius < 320) {
           const fresh  = spawn()
           Object.assign(p, fresh)
           continue
@@ -210,13 +210,13 @@ function ParticleCanvas({ centerTopPctRef }: { centerTopPctRef: React.RefObject<
         const x = cx + Math.cos(p.angle) * p.radius
         const y = cy + Math.sin(p.angle) * p.radius
 
-        // Opacity: fade in from outer edge, fade out as radius approaches 400
+        // Opacity: fade in from outer edge, fade out as radius approaches 320
         const ratio = p.radius / p.maxRadius
         const target = ratio > 0.90
-          ? (1 - ratio) / 0.10 * 0.65
-          : p.radius < 500
-          ? ((p.radius - 400) / 100) * 0.65
-          : 0.65
+          ? (1 - ratio) / 0.10 * 0.50
+          : p.radius < 420
+          ? ((p.radius - 320) / 100) * 0.50
+          : 0.50
         p.opacity += (target - p.opacity) * 0.08 * dt
         if (p.opacity < 0.01) continue
 
@@ -250,7 +250,7 @@ function ParticleCanvas({ centerTopPctRef }: { centerTopPctRef: React.RefObject<
       style={{
         position: 'absolute', inset: 0,
         width: '100%', height: '100%',
-        zIndex: 3, pointerEvents: 'none',
+        zIndex: 4, pointerEvents: 'none',
       }}
     />
   )
@@ -361,9 +361,6 @@ export default function SandboxHero() {
           }}
         />
 
-        {/* ── L1.5: Particle canvas ─────────────────────────────────────── */}
-        <ParticleCanvas centerTopPctRef={centerTopPctRef} />
-
         {/* ── L2: Orbiting tool icons — three rings ─────────────────────── */}
         <div
           style={{
@@ -385,6 +382,9 @@ export default function SandboxHero() {
             pointerEvents: 'none',
           }}
         />
+
+        {/* ── L3.5: Particle canvas — above vignette, below badge ───────── */}
+        <ParticleCanvas centerTopPctRef={centerTopPctRef} />
 
         {/* ── L4: Ripple — centered on animation center ─────────────────── */}
         <div

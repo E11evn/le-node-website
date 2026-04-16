@@ -12,27 +12,27 @@ export interface WheelStep {
 
 const DEFAULT_STEPS: WheelStep[] = [
   {
-    title: 'Learn your ICP',
+    title: 'Analyse your data',
     description: 'le node connects to your existing business data to learn who your ICP is.',
     icon: Users,
   },
   {
-    title: 'Qualify signals',
+    title: 'Scope your market',
     description: 'le node detects intent signals, qualifies and scores prospects based on your ICP.',
     icon: Target,
   },
   {
-    title: 'Engage leads',
+    title: 'Engage',
     description: "le node finds your leads' contact info to engage them in relevant conversations and generate opportunity, on autopilot.",
     icon: MessageSquare,
   },
   {
-    title: 'Sync your stack',
+    title: 'Sync back',
     description: 'Then syncs back to your stack to maintain your CRM up to date, and hands over the opportunities where your team already works.',
     icon: RefreshCw,
   },
   {
-    title: 'Track & learn',
+    title: 'Measure and learn',
     description: 'Track performance. le node continuously learns from results to enhance your outbound approach.',
     icon: TrendingUp,
   },
