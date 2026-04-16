@@ -176,6 +176,7 @@ export default function SandboxHero() {
   const labelFadeOut       = 1 - lerp(scrollProgress, 0.65, 0.80)
   const labelOpacity       = labelFadeIn * labelFadeOut
   const exitGroupOpacity   = 1 - lerp(scrollProgress, 0.65, 0.82)
+  const darkMaskOpacity    = lerp(scrollProgress, 0.60, 0.88)
   const nextSectionOpacity = lerp(scrollProgress, 0.72, 0.92)
 
   // Badge/orbital center: starts at 77 % (~100 px higher), moves to 50 %
@@ -340,7 +341,7 @@ export default function SandboxHero() {
             position: 'absolute',
             transform: 'translate(-50%, calc(-50% - 130px))',
             fontFamily: 'var(--font-nanum)', fontSize: '1.25rem',
-            fontWeight: 400, color: 'rgba(240,242,255,0.75)',
+            fontWeight: 700, color: 'rgba(240,242,255,0.85)',
             letterSpacing: '0.04em', whiteSpace: 'nowrap',
             opacity: labelOpacity, transition: 'opacity 0.4s ease',
           }}>
@@ -352,7 +353,7 @@ export default function SandboxHero() {
             position: 'absolute',
             transform: 'translate(-50%, calc(-50% + 130px))',
             fontFamily: 'var(--font-nanum)', fontSize: '1.25rem',
-            fontWeight: 400, color: 'rgba(240,242,255,0.75)',
+            fontWeight: 700, color: 'rgba(240,242,255,0.85)',
             letterSpacing: '0.04em', whiteSpace: 'nowrap',
             opacity: labelOpacity, transition: 'opacity 0.4s ease',
           }}>
@@ -467,6 +468,16 @@ export default function SandboxHero() {
             </button>
           </div>
         </div>
+
+        {/* ── L54: Full-screen dark mask — reaches 100% before unlock ──── */}
+        <div
+          style={{
+            position: 'absolute', inset: 0, zIndex: 54,
+            background: '#0F0F11',
+            opacity: darkMaskOpacity,
+            pointerEvents: 'none',
+          }}
+        />
 
         {/* ── L55: Next section placeholder — fades in at end ───────────── */}
         <div
