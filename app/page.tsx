@@ -38,7 +38,7 @@ export default function HomePage() {
             fontWeight: 800, fontSize: '2.25rem', lineHeight: 1.2,
             color: '#F0F2FF', marginBottom: '3.5rem',
           }}>
-            Battle tested methodology
+            Radical data-driven approach
           </h2>
           <CircularWheelStepper />
         </div>

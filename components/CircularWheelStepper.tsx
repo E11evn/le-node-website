@@ -206,16 +206,6 @@ export default function CircularWheelStepper({
               exit={{    opacity: 0, scale: 0.88, y: -6 }}
               transition={{ duration: 0.22, ease: 'easeOut' }}
             >
-              <p style={{
-                fontFamily:    'var(--font-open-sans, sans-serif)',
-                fontSize:      '0.625rem',
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color:         'rgba(0,67,250,0.8)',
-                marginBottom:  '0.4rem',
-              }}>
-                {String(active + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
-              </p>
               <h3 style={{
                 fontFamily:  'var(--font-nanum, serif)',
                 fontWeight:   800,
