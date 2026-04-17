@@ -1,8 +1,20 @@
 import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
+import { Nanum_Myeongjo, Open_Sans } from 'next/font/google'
 import './globals.css'
 import ScrollReveal from '@/components/ScrollReveal'
+
+const nanum = Nanum_Myeongjo({
+  weight: ['400', '700', '800'],
+  subsets: ['latin'],
+  variable: '--font-nanum',
+})
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  variable: '--font-open-sans',
+})
 
 export const metadata: Metadata = {
   title: 'le-node — GTM on autopilot',
@@ -22,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${nanum.variable} ${openSans.variable}`}>
       <body>
         {/* Site-wide structural frame: left and right content boundaries */}
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[1]">
