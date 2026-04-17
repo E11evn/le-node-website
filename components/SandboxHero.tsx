@@ -302,7 +302,7 @@ export default function SandboxHero() {
   const labelOpacity       = labelFadeIn * labelFadeOut
   const exitGroupOpacity   = 1 - lerp(scrollProgress, 0.65, 0.82)
   const darkMaskOpacity    = lerp(scrollProgress, 0.60, 0.74)  // 2× faster
-  const nextSectionOpacity = lerp(scrollProgress, 0.72, 0.92)
+  const nextSectionOpacity = lerp(scrollProgress, 0.60, 0.74)  // in sync with dark mask
 
   // Badge/orbital center: starts at 77 % (~100 px higher), moves to 50 %
   const animCenterTopPct = 77 - lerp(scrollProgress, 0.01, 0.40) * 27
