@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import { Users, Target, MessageSquare, RefreshCw, TrendingUp, LucideIcon } from 'lucide-react'
 
@@ -12,28 +12,28 @@ export interface WheelStep {
 
 const DEFAULT_STEPS: WheelStep[] = [
   {
-    title: 'Analyse your data',
+    title: 'Analyse',
     description: 'le node connects to your existing business data to learn who your ICP is.',
     icon: Users,
   },
   {
-    title: 'Scope your market',
+    title: 'Scope',
     description: 'le node detects intent signals, qualifies and scores prospects based on your ICP.',
     icon: Target,
   },
   {
     title: 'Engage',
-    description: "le node finds your leads' contact info to engage them in relevant conversations and generate opportunity, on autopilot.",
+    description: "le node finds your leads' contact infos to engage them in relevant conversations and generate opportunity.",
     icon: MessageSquare,
   },
   {
-    title: 'Sync back',
-    description: 'Then syncs back to your stack to maintain your CRM up to date, and hands over the opportunities where your team already works.',
+    title: 'Sync',
+    description: 'le node syncs back to your CRM to maintain your data up to date, and hands over the opportunities where your team already works.',
     icon: RefreshCw,
   },
   {
-    title: 'Measure and learn',
-    description: 'Track performance. le node continuously learns from results to enhance your outbound approach.',
+    title: 'Track and learn',
+    description: 'le node keeps tracking performance and learns from results to continuously enhance your GTM motion.',
     icon: TrendingUp,
   },
 ]
@@ -52,6 +52,8 @@ export default function CircularWheelStepper({
   steps?: WheelStep[]
 }) {
   const [active, setActive] = useState(0)
+  const [hasEnteredView, setHasEnteredView] = useState(false)
+  const wheelRef = useRef<HTMLDivElement>(null)
   const total = steps.length
 
   const circumference = 2 * Math.PI * TRACK
@@ -60,7 +62,26 @@ export default function CircularWheelStepper({
   // Arc endpoint is animated continuously from active → active+1 over 5s
   const dashOffset = useMotionValue(circumference - segmentLength * active)
 
+  // Trigger animation only once the wheel scrolls into view
   useEffect(() => {
+    if (hasEnteredView) return
+    const el = wheelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setHasEnteredView(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.35 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasEnteredView])
+
+  useEffect(() => {
+    if (!hasEnteredView) return
     const start = circumference - segmentLength * active
     const end   = circumference - segmentLength * (active + 1)
     dashOffset.set(start)
@@ -70,7 +91,7 @@ export default function CircularWheelStepper({
       onComplete: () => setActive((a) => (a + 1) % total),
     })
     return () => controls.stop()
-  }, [active, total, circumference, segmentLength, dashOffset])
+  }, [active, total, circumference, segmentLength, dashOffset, hasEnteredView])
 
   // Positions of step markers on the circle (top = -90°)
   const positions = steps.map((_, i) => {
@@ -85,7 +106,7 @@ export default function CircularWheelStepper({
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
 
       {/* ── Wheel ─────────────────────────────────────────────────────── */}
-      <div style={{ position: 'relative', width: SIZE, height: SIZE }}>
+      <div ref={wheelRef} style={{ position: 'relative', width: SIZE, height: SIZE }}>
 
         {/* SVG rings */}
         <svg
