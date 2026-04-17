@@ -302,11 +302,11 @@ export default function SandboxHero() {
   const labelOpacity       = labelFadeIn * labelFadeOut
   const exitGroupOpacity   = 1 - lerp(scrollProgress, 0.65, 0.82)
   const darkMaskOpacity    = lerp(scrollProgress, 0.60, 0.74)  // 2× faster
-  // Exit block: slides up from below viewport (0.60) to above (1.00),
-  // passing through center at 0.80 — opacity peaks at center (0.60 → 0.80).
+  // Exit block: slides up from below viewport (0.60), lands centered at end of
+  // sticky (1.00). After sticky releases, it scrolls out naturally into "How it works".
   const exitScrollP        = lerp(scrollProgress, 0.60, 1.00)
-  const exitTranslateY     = (0.5 - exitScrollP) * windowHeight
-  const nextSectionOpacity = Math.min(1, exitScrollP * 2)
+  const exitTranslateY     = (1 - exitScrollP) * windowHeight * 0.5
+  const nextSectionOpacity = Math.min(1, exitScrollP * 1.5)
 
   // Badge/orbital center: starts at 77 % (~100 px higher), moves to 50 %
   const animCenterTopPct = 77 - lerp(scrollProgress, 0.01, 0.40) * 27
