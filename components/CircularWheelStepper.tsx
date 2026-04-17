@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import { Users, Target, MessageSquare, RefreshCw, TrendingUp, LucideIcon } from 'lucide-react'
 
 export interface WheelStep {
@@ -44,6 +44,8 @@ const CY     = SIZE / 2
 const RADIUS = 148   // orbit radius for step markers
 const TRACK  = 152   // slightly larger for the SVG progress ring
 
+const STEP_DURATION_S = 5  // seconds for arc to fill from one icon to the next
+
 export default function CircularWheelStepper({
   steps = DEFAULT_STEPS,
 }: {
@@ -53,10 +55,22 @@ export default function CircularWheelStepper({
   const total = steps.length
 
   const circumference = 2 * Math.PI * TRACK
+  const segmentLength = circumference / total
 
-  // Arc fills segment by segment; 0 steps done → 0, all done → full
-  const segmentAngle = (2 * Math.PI * TRACK) / total
-  const dashOffset   = circumference - segmentAngle * (active + 1)
+  // Arc endpoint is animated continuously from active → active+1 over 5s
+  const dashOffset = useMotionValue(circumference - segmentLength * active)
+
+  useEffect(() => {
+    const start = circumference - segmentLength * active
+    const end   = circumference - segmentLength * (active + 1)
+    dashOffset.set(start)
+    const controls = animate(dashOffset, end, {
+      duration: STEP_DURATION_S,
+      ease: 'linear',
+      onComplete: () => setActive((a) => (a + 1) % total),
+    })
+    return () => controls.stop()
+  }, [active, total, circumference, segmentLength, dashOffset])
 
   // Positions of step markers on the circle (top = -90°)
   const positions = steps.map((_, i) => {
@@ -86,7 +100,7 @@ export default function CircularWheelStepper({
             stroke="rgba(240,242,255,0.07)"
             strokeWidth={1.5}
           />
-          {/* Animated progress arc */}
+          {/* Animated progress arc — drains over 5s from one icon to next */}
           <motion.circle
             cx={CX} cy={CY} r={TRACK}
             fill="none"
@@ -94,10 +108,8 @@ export default function CircularWheelStepper({
             strokeWidth={2}
             strokeLinecap="round"
             strokeDasharray={circumference}
-            animate={{ strokeDashoffset: dashOffset }}
-            initial={{ strokeDashoffset: circumference }}
-            transition={{ duration: 0.7, ease: [0.22, 0.61, 0.36, 1] }}
             style={{
+              strokeDashoffset: dashOffset,
               transform: 'rotate(-90deg)',
               transformOrigin: `${CX}px ${CY}px`,
             }}
@@ -116,14 +128,15 @@ export default function CircularWheelStepper({
 
         {/* Step markers */}
         {steps.map((step, i) => {
-          const pos     = positions[i]
-          const isActive = i === active
-          const Icon    = step.icon
+          const pos       = positions[i]
+          const isFilled  = i <= active    // all visited + current are highlighted
+          const isCurrent = i === active   // only the current one scales + glows
+          const Icon      = step.icon
           return (
             <motion.button
               key={i}
               onClick={() => setActive(i)}
-              animate={{ scale: isActive ? 1.18 : 1 }}
+              animate={{ scale: isCurrent ? 1.18 : 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 22 }}
               style={{
                 position:  'absolute',
@@ -132,16 +145,17 @@ export default function CircularWheelStepper({
                 width:     44,
                 height:    44,
                 borderRadius: '50%',
-                background:   isActive ? '#0043FA' : 'rgba(15,15,17,0.95)',
-                border:       `1.5px solid ${isActive ? '#0043FA' : 'rgba(240,242,255,0.13)'}`,
-                boxShadow:    isActive ? '0 0 16px rgba(0,67,250,0.45)' : 'none',
+                background:   isFilled ? '#0043FA' : 'rgba(15,15,17,0.95)',
+                border:       `1.5px solid ${isFilled ? '#0043FA' : 'rgba(240,242,255,0.13)'}`,
+                boxShadow:    isCurrent ? '0 0 16px rgba(0,67,250,0.45)' : 'none',
                 display:      'flex',
                 alignItems:   'center',
                 justifyContent: 'center',
                 cursor:       'pointer',
-                color:        isActive ? '#fff' : 'rgba(240,242,255,0.38)',
+                color:        isFilled ? '#fff' : 'rgba(240,242,255,0.38)',
                 padding:      0,
                 zIndex:       2,
+                transition:   'background 0.35s ease, border-color 0.35s ease, color 0.35s ease',
               }}
             >
               <Icon size={16} strokeWidth={2} />

@@ -95,7 +95,7 @@ export default function HomePage() {
             fontWeight: 800, fontSize: '2.25rem', lineHeight: 1.2,
             color: '#F0F2FF', marginBottom: '3rem', textAlign: 'center',
           }}>
-            Questions fréquentes
+            Frequently asked questions
           </h2>
           <style>{`
             .faq-item { border-top: 1px solid rgba(240,242,255,0.08); }
@@ -127,28 +127,28 @@ export default function HomePage() {
           `}</style>
           {[
             {
-              q: "Qu'est-ce que le node ?",
-              a: "le node est un OS GTM AI-native qui orchestre vos meilleurs outils go-to-market pour connecter votre équipe avec votre marché — de la détection des signaux d'intention jusqu'à la clôture des opportunités, en automatique.",
+              q: "What is le node?",
+              a: "le node is an AI-native GTM OS that orchestrates your best-in-class go-to-market tools to connect your team with your market — from intent signal detection all the way to opportunity closing, automatically.",
             },
             {
-              q: "Comment le node se connecte-t-il à mes outils existants ?",
-              a: "En quelques minutes, sans code. le node s'intègre nativement avec votre CRM (HubSpot, Salesforce, Pipedrive), vos séquenceurs, vos outils d'enrichissement et vos sources de données. Aucune intervention technique requise.",
+              q: "How does le node connect to my existing tools?",
+              a: "In minutes, no code required. le node integrates natively with your CRM (HubSpot, Salesforce, Pipedrive), your sequencers, your enrichment tools, and your data sources. No technical setup needed.",
             },
             {
-              q: "Est-ce adapté à la taille de mon équipe ?",
-              a: "le node est conçu pour les équipes revenue en hypercroissance, de 2 à 200 personnes. Que vous soyez AE solo ou RevOps dans une scale-up, le node s'adapte à votre stade et à votre stack.",
+              q: "Is it suited to the size of my team?",
+              a: "le node is built for revenue teams in hypergrowth, from 2 to 200 people. Whether you're a solo AE or RevOps at a scale-up, le node adapts to your stage and your stack.",
             },
             {
-              q: "Quand pourrai-je y accéder ?",
-              a: "le node est en accès anticipé. Rejoignez la liste d'attente pour être parmi les premiers à tester la plateforme et bénéficier d'un onboarding personnalisé.",
+              q: "When can I get access?",
+              a: "le node is in early access. Join the waitlist to be among the first to try the platform and get personalized onboarding.",
             },
             {
-              q: "Comment fonctionne la tarification ?",
-              a: "La tarification sera basée sur l'usage et le volume de contacts traités. Les premiers accès bénéficieront de conditions préférentielles. Les détails seront partagés lors de l'onboarding.",
+              q: "How does pricing work?",
+              a: "Pricing will be based on usage and the volume of contacts processed. Early-access users get preferential terms. Details will be shared during onboarding.",
             },
             {
-              q: "Mes données sont-elles sécurisées ?",
-              a: "Oui. le node est conforme RGPD. Vos données ne sont jamais revendues ni utilisées pour entraîner des modèles tiers. L'accès est contrôlé et chiffré de bout en bout.",
+              q: "Is my data secure?",
+              a: "Yes. le node is GDPR-compliant. Your data is never resold or used to train third-party models. Access is controlled and end-to-end encrypted.",
             },
           ].map(({ q, a }) => (
             <details key={q} className="faq-item">
