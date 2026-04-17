@@ -302,7 +302,11 @@ export default function SandboxHero() {
   const labelOpacity       = labelFadeIn * labelFadeOut
   const exitGroupOpacity   = 1 - lerp(scrollProgress, 0.65, 0.82)
   const darkMaskOpacity    = lerp(scrollProgress, 0.60, 0.74)  // 2× faster
-  const nextSectionOpacity = lerp(scrollProgress, 0.60, 0.74)  // in sync with dark mask
+  // Exit block: slides up from below viewport (0.60) to above (1.00),
+  // passing through center at 0.80 — opacity peaks at center (0.60 → 0.80).
+  const exitScrollP        = lerp(scrollProgress, 0.60, 1.00)
+  const exitTranslateY     = (0.5 - exitScrollP) * windowHeight
+  const nextSectionOpacity = Math.min(1, exitScrollP * 2)
 
   // Badge/orbital center: starts at 77 % (~100 px higher), moves to 50 %
   const animCenterTopPct = 77 - lerp(scrollProgress, 0.01, 0.40) * 27
@@ -608,18 +612,19 @@ export default function SandboxHero() {
           }}
         />
 
-        {/* ── L55: Next section placeholder — fades in at end ───────────── */}
+        {/* ── L55: Exit block — scrolls into view from below, centers mid-screen ── */}
         <div
           style={{
             position: 'absolute', inset: 0, zIndex: 55,
             display: 'flex', flexDirection: 'column',
-            justifyContent: 'flex-end', paddingBottom: '8rem',
+            justifyContent: 'center', alignItems: 'center',
             opacity: nextSectionOpacity,
+            transform: `translateY(${exitTranslateY}px)`,
             pointerEvents: nextSectionOpacity > 0.5 ? 'auto' : 'none',
-            background: 'linear-gradient(to top, rgba(15,15,17,0.95) 30%, transparent 100%)',
+            willChange: 'transform, opacity',
           }}
         >
-          <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
+          <div style={{ textAlign: 'center' }}>
             {/* Logo strip */}
             <p style={{
               fontFamily: 'var(--font-open-sans)', fontSize: '0.6875rem',
